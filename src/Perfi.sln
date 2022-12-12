@@ -11,10 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perfi.PlayGround", "Perfi.P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perfi.Infrastructure", "Perfi.Infrastructure\Perfi.Infrastructure.csproj", "{4AE76118-2F2F-45FA-A698-627420C86AA1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perfi.Command.Api", "Perfi.Command.Api\Perfi.Command.Api.csproj", "{E425D390-E104-4DFE-B897-D5C9D913DF4D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perfi.Query.Api", "Perfi.Query.Api\Perfi.Query.Api.csproj", "{86CAAB6E-780B-45E5-B0C9-F48350617C92}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Applications", "Applications", "{B8FF2C6F-823E-41F0-BFDD-B695E9EB7209}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{18A847FA-746A-4FDC-BFB6-5229A2F8D399}"
@@ -46,14 +42,6 @@ Global
 		{4AE76118-2F2F-45FA-A698-627420C86AA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AE76118-2F2F-45FA-A698-627420C86AA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AE76118-2F2F-45FA-A698-627420C86AA1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E425D390-E104-4DFE-B897-D5C9D913DF4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E425D390-E104-4DFE-B897-D5C9D913DF4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E425D390-E104-4DFE-B897-D5C9D913DF4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E425D390-E104-4DFE-B897-D5C9D913DF4D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{86CAAB6E-780B-45E5-B0C9-F48350617C92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{86CAAB6E-780B-45E5-B0C9-F48350617C92}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{86CAAB6E-780B-45E5-B0C9-F48350617C92}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{86CAAB6E-780B-45E5-B0C9-F48350617C92}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ED1B3182-5B1C-4BDF-82D4-152587E09753}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ED1B3182-5B1C-4BDF-82D4-152587E09753}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED1B3182-5B1C-4BDF-82D4-152587E09753}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -63,8 +51,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{E425D390-E104-4DFE-B897-D5C9D913DF4D} = {B8FF2C6F-823E-41F0-BFDD-B695E9EB7209}
-		{86CAAB6E-780B-45E5-B0C9-F48350617C92} = {B8FF2C6F-823E-41F0-BFDD-B695E9EB7209}
 		{ED1B3182-5B1C-4BDF-82D4-152587E09753} = {B8FF2C6F-823E-41F0-BFDD-B695E9EB7209}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

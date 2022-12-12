@@ -33,6 +33,7 @@ builder.Services.AddScoped<ISummaryAccountRepository, SummaryAccountRepository>(
 builder.Services.AddScoped<ITransactionalAccountRepository, TransactionalAccountRepository>();
 //services
 builder.Services.AddScoped<IAddCashAccountService, AddCashAccountService>();
+builder.Services.AddScoped<ICashAccountQueryService, CashAccountQueryService>();
 
 
 var app = builder.Build();

@@ -11,5 +11,6 @@ namespace Perfi.Core.Accounts.CashAccountAggregate
     public interface ICashAccountRepository : IRepository<CashAccount>
     {
         CashAccount Add(CashAccount cashAccount);
+        Task<List<CashAccount>> GetAllAsync();
     }
 }
