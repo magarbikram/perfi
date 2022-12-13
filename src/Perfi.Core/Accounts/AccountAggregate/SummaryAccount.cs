@@ -13,6 +13,7 @@
         public static class DefaultAccountNumbers
         {
             public const string BankCashAccount = "100-01";
+            public const string CreditCardAccount = "200-01";
         }
 
         private List<Account> _components = new();

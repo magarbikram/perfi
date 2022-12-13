@@ -3,6 +3,7 @@ using Perfi.Api.Responses;
 using Perfi.Api.Services;
 using Perfi.Core.Accounts.AccountAggregate;
 using Perfi.Core.Accounts.CashAccountAggregate;
+using Perfi.Core.Accounts.CreditCardAggregate;
 using Perfi.Infrastructure.Database;
 using Perfi.Infrastructure.Database.Repositories;
 
@@ -31,9 +32,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ICashAccountRepository, CashAccountRepository>();
 builder.Services.AddScoped<ISummaryAccountRepository, SummaryAccountRepository>();
 builder.Services.AddScoped<ITransactionalAccountRepository, TransactionalAccountRepository>();
+builder.Services.AddScoped<ICreditCardAccountRepository, CreditCardAccountRepository>();
 //services
 builder.Services.AddScoped<IAddCashAccountService, AddCashAccountService>();
 builder.Services.AddScoped<ICashAccountQueryService, CashAccountQueryService>();
+builder.Services.AddScoped<IAddCreditCardAccountService, AddCreditCardAccountService>();
+builder.Services.AddScoped<ICreditCardAccountQueryService, CreditCardAccountQueryService>();
 
 
 var app = builder.Build();

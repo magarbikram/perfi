@@ -30,6 +30,8 @@ namespace Perfi.Infrastructure.Database.EFConfigurations
             builder.HasDiscriminator<string>("Type")
                    .HasValue<SummaryAccount>("Summary")
                    .HasValue<TransactionalAccount>("Transactional");
+
+            builder.Property("Type").HasMaxLength(13);
         }
     }
 }
