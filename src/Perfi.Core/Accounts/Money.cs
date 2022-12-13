@@ -1,20 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CSharpFunctionalExtensions;
 
 namespace Perfi.Core.Accounting
 {
-    public class Money
+    public class Money : ValueObject
     {
-        public Money(int v1, string v2)
+        protected Money()
         {
-            V1 = v1;
-            V2 = v2;
+
         }
 
-        public int V1 { get; }
-        public string V2 { get; }
+        public decimal Value { get; private set; }
+        public string Currency { get; private set; }
+
+        public static Money From(decimal value, string currency)
+        {
+            return new Money { Value = value, Currency = currency };
+        }
+        protected override IEnumerable<object> GetEqualityComponents()
+        {
+            yield return Value;
+            yield return Currency;
+        }
     }
 }

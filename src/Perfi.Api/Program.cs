@@ -4,6 +4,7 @@ using Perfi.Api.Services;
 using Perfi.Core.Accounts.AccountAggregate;
 using Perfi.Core.Accounts.CashAccountAggregate;
 using Perfi.Core.Accounts.CreditCardAggregate;
+using Perfi.Core.Accounts.LoanAggregate;
 using Perfi.Infrastructure.Database;
 using Perfi.Infrastructure.Database.Repositories;
 
@@ -33,11 +34,14 @@ builder.Services.AddScoped<ICashAccountRepository, CashAccountRepository>();
 builder.Services.AddScoped<ISummaryAccountRepository, SummaryAccountRepository>();
 builder.Services.AddScoped<ITransactionalAccountRepository, TransactionalAccountRepository>();
 builder.Services.AddScoped<ICreditCardAccountRepository, CreditCardAccountRepository>();
+builder.Services.AddScoped<ILoanRepository, LoanRepository>();
 //services
 builder.Services.AddScoped<IAddCashAccountService, AddCashAccountService>();
 builder.Services.AddScoped<ICashAccountQueryService, CashAccountQueryService>();
 builder.Services.AddScoped<IAddCreditCardAccountService, AddCreditCardAccountService>();
 builder.Services.AddScoped<ICreditCardAccountQueryService, CreditCardAccountQueryService>();
+builder.Services.AddScoped<IAddLoanService, AddLoanService>();
+builder.Services.AddScoped<ILoanQueryService, LoanQueryService>();
 
 
 var app = builder.Build();

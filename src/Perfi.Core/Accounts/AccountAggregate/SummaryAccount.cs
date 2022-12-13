@@ -14,6 +14,7 @@
         {
             public const string BankCashAccount = "100-01";
             public const string CreditCardAccount = "200-01";
+            public const string LoanAccount = "200-02";
         }
 
         private List<Account> _components = new();
