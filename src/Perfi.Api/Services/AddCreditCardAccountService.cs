@@ -31,7 +31,7 @@ namespace Perfi.Api.Services
         private TransactionalAccount AddAssociatedTransactionalAccount(AddNewCreditCardAccountCommand addNewCreditCardAccountCommand)
         {
             AccountNumber CreditCardSummaryAccountNumber = AccountNumber.From(SummaryAccount.DefaultAccountNumbers.CreditCardAccount);
-            TransactionalAccount newCreditCardAccount = TransactionalAccount.NewAssetAccount(number: addNewCreditCardAccountCommand.Code, name: addNewCreditCardAccountCommand.Name, parentAccountNumber: CreditCardSummaryAccountNumber);
+            TransactionalAccount newCreditCardAccount = TransactionalAccount.NewLiabilityAccount(number: addNewCreditCardAccountCommand.Code, name: addNewCreditCardAccountCommand.Name, parentAccountNumber: CreditCardSummaryAccountNumber);
             newCreditCardAccount = _transactionalAccountRepository.Add(newCreditCardAccount);
             return newCreditCardAccount;
         }

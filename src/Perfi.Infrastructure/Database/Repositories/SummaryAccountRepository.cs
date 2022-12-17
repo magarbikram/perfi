@@ -23,7 +23,7 @@ namespace Perfi.Infrastructure.Database.Repositories
 
         public async Task<Maybe<SummaryAccount>> GetByNumberAsync(string accountNumber)
         {
-            SummaryAccount summaryAccount = await _appDbContext.SummaryAccounts.FirstOrDefaultAsync(account => account.Number == AccountNumber.From(accountNumber));
+            SummaryAccount? summaryAccount = await _appDbContext.SummaryAccounts.FirstOrDefaultAsync(account => account.Number == AccountNumber.From(accountNumber));
             if (summaryAccount == null)
             {
                 return Maybe<SummaryAccount>.None;

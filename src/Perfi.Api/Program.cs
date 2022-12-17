@@ -5,6 +5,7 @@ using Perfi.Core.Accounts.AccountAggregate;
 using Perfi.Core.Accounts.CashAccountAggregate;
 using Perfi.Core.Accounts.CreditCardAggregate;
 using Perfi.Core.Accounts.LoanAggregate;
+using Perfi.Core.Expenses;
 using Perfi.Infrastructure.Database;
 using Perfi.Infrastructure.Database.Repositories;
 
@@ -35,6 +36,8 @@ builder.Services.AddScoped<ISummaryAccountRepository, SummaryAccountRepository>(
 builder.Services.AddScoped<ITransactionalAccountRepository, TransactionalAccountRepository>();
 builder.Services.AddScoped<ICreditCardAccountRepository, CreditCardAccountRepository>();
 builder.Services.AddScoped<ILoanRepository, LoanRepository>();
+builder.Services.AddScoped<ISummaryExpenseCategoryRepository, SummaryExpenseCategoryRepository>();
+builder.Services.AddScoped<ITransactionalExpenseCategoryRepository, TransactionalExpenseCategoryRepository>();
 //services
 builder.Services.AddScoped<IAddCashAccountService, AddCashAccountService>();
 builder.Services.AddScoped<ICashAccountQueryService, CashAccountQueryService>();
@@ -42,7 +45,11 @@ builder.Services.AddScoped<IAddCreditCardAccountService, AddCreditCardAccountSer
 builder.Services.AddScoped<ICreditCardAccountQueryService, CreditCardAccountQueryService>();
 builder.Services.AddScoped<IAddLoanService, AddLoanService>();
 builder.Services.AddScoped<ILoanQueryService, LoanQueryService>();
-
+builder.Services.AddScoped<IAddSummaryExpenseCategoryService, AddSummaryExpenseCategoryService>();
+builder.Services.AddScoped<ISummaryExpenseCategoryQueryService, SummaryExpenseCategoryQueryService>();
+builder.Services.AddScoped<IAddTransactionalExpenseCategoryService, AddTransactionalExpenseCategoryService>();
+builder.Services.AddScoped<IAddExpenseAccountService, AddExpenseAccountService>();
+builder.Services.AddScoped<IExpenseAccountQueryService, ExpenseAccountQueryService>();
 
 var app = builder.Build();
 app.UseCors();

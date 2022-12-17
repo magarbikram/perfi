@@ -20,5 +20,23 @@ namespace Perfi.Core.Accounts.AccountAggregate
                 ParentAccountNumber = parentAccountNumber
             };
         }
+
+        public static TransactionalAccount NewLiabilityAccount(string number, string name, AccountNumber parentAccountNumber)
+        {
+            GuardAgainstInvalidName(name);
+            return new(AccountNumber.From(number), name, AccountCategory.Liabilities)
+            {
+                ParentAccountNumber = parentAccountNumber
+            };
+        }
+
+        public static TransactionalAccount NewExpenseAccount(string number, string name, AccountNumber parentAccountNumber)
+        {
+            GuardAgainstInvalidName(name);
+            return new(AccountNumber.From(number), name, AccountCategory.Expenses)
+            {
+                ParentAccountNumber = parentAccountNumber
+            };
+        }
     }
 }

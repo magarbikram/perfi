@@ -30,7 +30,7 @@ namespace Perfi.Api.Services
         private TransactionalAccount AddAssociatedTransactionalAccountAsync(AddNewLoanCommand addNewLoanCommand)
         {
             AccountNumber bankCashSummaryAccountNumber = AccountNumber.From(SummaryAccount.DefaultAccountNumbers.LoanAccount);
-            TransactionalAccount newBankLoan = TransactionalAccount.NewAssetAccount(number: addNewLoanCommand.Code, name: addNewLoanCommand.Name, parentAccountNumber: bankCashSummaryAccountNumber);
+            TransactionalAccount newBankLoan = TransactionalAccount.NewLiabilityAccount(number: addNewLoanCommand.Code, name: addNewLoanCommand.Name, parentAccountNumber: bankCashSummaryAccountNumber);
             newBankLoan = _transactionalAccountRepository.Add(newBankLoan);
             return newBankLoan;
         }
