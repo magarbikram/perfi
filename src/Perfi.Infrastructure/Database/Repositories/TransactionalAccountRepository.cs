@@ -43,5 +43,16 @@ namespace Perfi.Infrastructure.Database.Repositories
             }
             return transactionalAccount;
         }
+
+        public async Task<Maybe<TransactionalAccount>> GetByAccountNumberAsync(AccountNumber accountNumber)
+        {
+            TransactionalAccount? transactionalAccount = await _appDbContext.TransactionalAccounts.FirstOrDefaultAsync(ta =>
+                                                                                                        ta.Number == accountNumber);
+            if (transactionalAccount == null)
+            {
+                return Maybe<TransactionalAccount>.None;
+            }
+            return transactionalAccount;
+        }
     }
 }

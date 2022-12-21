@@ -1,4 +1,5 @@
-﻿using Perfi.SharedKernel;
+﻿using CSharpFunctionalExtensions;
+using Perfi.SharedKernel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,5 +13,6 @@ namespace Perfi.Core.Accounts.CashAccountAggregate
     {
         CashAccount Add(CashAccount cashAccount);
         Task<List<CashAccount>> GetAllAsync();
+        Task<Maybe<CashAccount>> GetByIdAsync(int cashAccountId);
     }
 }

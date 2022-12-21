@@ -1,26 +1,38 @@
-﻿
-using Perfi.Core.Accounts.AccountAggregate;
+﻿using Perfi.Core.Accounts.AccountAggregate;
 using Perfi.SharedKernel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Perfi.Core.Accounting.AccountingTransactionAggregate
 {
     public class AccountingEntry : BaseEntity
     {
-        public AccountingEntry(TransactionalAccount account, DateTimeOffset bookedTime, Money amount)
-        {
-            AccountNumber = account.Number;
-            BookedTime = bookedTime;
-            Amount = amount;
-        }
+        public DateTimeOffset DocumentDate { get; private set; }
+        public DateTimeOffset TransactionDate { get; private set; }
 
         public AccountNumber AccountNumber { get; private set; }//must be detail account number and not summary account number
-        public DateTimeOffset BookedTime { get; private set; }
-        public Money Amount { get; private set; }
+        public Money DebitAmount { get; private set; }
+        public Money CreditAmount { get; private set; }
 
+        public static AccountingEntry Credit(TransactionalAccount account, Money amount, DateTimeOffset transactionDate)
+        {
+            return new AccountingEntry
+            {
+                AccountNumber = account.Number,
+                DocumentDate = DateTimeOffset.UtcNow,
+                CreditAmount = amount,
+                TransactionDate = transactionDate.UtcDateTime
+            };
+        }
+
+        public static AccountingEntry Debit(TransactionalAccount account, Money amount, DateTimeOffset transactionDate)
+        {
+            return new AccountingEntry
+            {
+                AccountNumber = account.Number,
+                DocumentDate = DateTimeOffset.UtcNow,
+                DebitAmount = amount,
+
+                TransactionDate = transactionDate.UtcDateTime
+            };
+        }
     }
 }

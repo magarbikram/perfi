@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Perfi.Infrastructure.Database;
@@ -11,9 +12,11 @@ using Perfi.Infrastructure.Database;
 namespace Perfi.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221221165233_AddExpenseAndRelatedTables")]
+    partial class AddExpenseAndRelatedTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -411,10 +414,11 @@ namespace Perfi.Infrastructure.Migrations
                                 .HasColumnType("integer");
 
                             b1.Property<string>("Currency")
+                                .IsRequired()
                                 .HasMaxLength(4)
                                 .HasColumnType("character varying(4)");
 
-                            b1.Property<decimal?>("Value")
+                            b1.Property<decimal>("Value")
                                 .HasColumnType("numeric");
 
                             b1.HasKey("AccountingEntryId");
@@ -431,10 +435,11 @@ namespace Perfi.Infrastructure.Migrations
                                 .HasColumnType("integer");
 
                             b1.Property<string>("Currency")
+                                .IsRequired()
                                 .HasMaxLength(4)
                                 .HasColumnType("character varying(4)");
 
-                            b1.Property<decimal?>("Value")
+                            b1.Property<decimal>("Value")
                                 .HasColumnType("numeric");
 
                             b1.HasKey("AccountingEntryId");
@@ -472,8 +477,7 @@ namespace Perfi.Infrastructure.Migrations
                                 .HasMaxLength(5)
                                 .HasColumnType("character varying(5)");
 
-                            b1.Property<decimal?>("Value")
-                                .IsRequired()
+                            b1.Property<decimal>("Value")
                                 .HasColumnType("numeric");
 
                             b1.HasKey("LoanId");
@@ -500,7 +504,7 @@ namespace Perfi.Infrastructure.Migrations
                                 .HasMaxLength(4)
                                 .HasColumnType("character varying(4)");
 
-                            b1.Property<decimal?>("Value")
+                            b1.Property<decimal>("Value")
                                 .HasColumnType("numeric");
 
                             b1.HasKey("ExpenseId");

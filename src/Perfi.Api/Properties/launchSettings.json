@@ -24,7 +24,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://perfiapipc.sytes.net:10956",
+      "applicationUrl": "http://localhost:10956",
       "sslPort": 44330
     }
   }

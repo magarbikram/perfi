@@ -1,4 +1,5 @@
-﻿using Perfi.Core.Accounts.CashAccountAggregate;
+﻿using CSharpFunctionalExtensions;
+using Perfi.Core.Accounts.CashAccountAggregate;
 using Perfi.SharedKernel;
 
 namespace Perfi.Core.Accounts.CreditCardAggregate
@@ -7,5 +8,6 @@ namespace Perfi.Core.Accounts.CreditCardAggregate
     {
         CreditCardAccount Add(CreditCardAccount cashAccount);
         Task<List<CreditCardAccount>> GetAllAsync();
+        Task<Maybe<CreditCardAccount>> GetByIdAsync(int creditCardAccountId);
     }
 }

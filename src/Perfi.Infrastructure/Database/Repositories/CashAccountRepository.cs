@@ -1,11 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CSharpFunctionalExtensions;
+using Microsoft.EntityFrameworkCore;
 using Perfi.Core.Accounts.CashAccountAggregate;
 using Perfi.SharedKernel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Perfi.Infrastructure.Database.Repositories
 {
@@ -27,6 +23,16 @@ namespace Perfi.Infrastructure.Database.Repositories
         public async Task<List<CashAccount>> GetAllAsync()
         {
             return await _appDbContext.CashAccounts.ToListAsync();
+        }
+
+        public async Task<Maybe<CashAccount>> GetByIdAsync(int cashAccountId)
+        {
+            CashAccount? creditCardAccount = await _appDbContext.CashAccounts.FirstOrDefaultAsync(cca => cca.Id == cashAccountId);
+            if (creditCardAccount == null)
+            {
+                return Maybe<CashAccount>.None;
+            }
+            return creditCardAccount;
         }
     }
 }

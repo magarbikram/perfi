@@ -8,13 +8,6 @@ namespace Perfi.Core.Accounts.CashAccountAggregate
     {
         public string Name { get; private set; }
         public string BankName { get; private set; }
-
-        public static class MaxLengths
-        {
-            public const int Name = 150;
-            public const int BankName = 100;
-        }
-
         public AccountNumber AssociatedAccountNumber { get; private set; }
 
         public static CashAccount From(string name, string bankName, TransactionalAccount associatedTransactionalAccount)
@@ -41,6 +34,12 @@ namespace Perfi.Core.Accounts.CashAccountAggregate
         {
             Guard.Against.NullOrEmpty(name, nameof(name));
             Guard.Against.OutOfRange(name.Length, nameof(name), rangeFrom: 1, rangeTo: MaxLengths.Name);
+        }
+
+        public static class MaxLengths
+        {
+            public const int Name = 150;
+            public const int BankName = 100;
         }
     }
 }

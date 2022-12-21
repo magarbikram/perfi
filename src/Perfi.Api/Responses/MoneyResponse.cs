@@ -11,7 +11,7 @@ namespace Perfi.Api.Responses
         public static MoneyResponse From(Money money)
         {
             Guard.Against.Null(money, nameof(money));
-            return new MoneyResponse { Value = money.Value, Currency = money.Currency };
+            return new MoneyResponse { Value = money.Value.Value, Currency = money.Currency };
         }
     }
 }

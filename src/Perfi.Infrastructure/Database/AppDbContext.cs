@@ -17,6 +17,7 @@ namespace Perfi.Infrastructure.Database
         public DbSet<TransactionalAccount> TransactionalAccounts { get; set; }
         public DbSet<SummaryExpenseCategory> SummaryExpenseCategories { get; set; }
         public DbSet<TransactionalExpenseCategory> TransactionalExpenseCategories { get; set; }
+        public DbSet<Expense> Expenses { get; set; }
         public DbSet<Loan> Loans { get; set; }
 
         public AppDbContext(DbContextOptions options) : base(options)

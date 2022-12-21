@@ -2,12 +2,14 @@ using Microsoft.EntityFrameworkCore;
 using Perfi.Api.Responses;
 using Perfi.Api.Services;
 using Perfi.Core.Accounts.AccountAggregate;
+using Perfi.Core.Accounts.AccountingTransactionAggregate;
 using Perfi.Core.Accounts.CashAccountAggregate;
 using Perfi.Core.Accounts.CreditCardAggregate;
 using Perfi.Core.Accounts.LoanAggregate;
 using Perfi.Core.Expenses;
 using Perfi.Infrastructure.Database;
 using Perfi.Infrastructure.Database.Repositories;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -24,7 +26,10 @@ string? connectionString = builder.Configuration.GetConnectionString("DatabaseCo
 builder.Services.AddDbContext<AppDbContext>(options =>
           options.UseNpgsql(connectionString));
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -38,6 +43,8 @@ builder.Services.AddScoped<ICreditCardAccountRepository, CreditCardAccountReposi
 builder.Services.AddScoped<ILoanRepository, LoanRepository>();
 builder.Services.AddScoped<ISummaryExpenseCategoryRepository, SummaryExpenseCategoryRepository>();
 builder.Services.AddScoped<ITransactionalExpenseCategoryRepository, TransactionalExpenseCategoryRepository>();
+builder.Services.AddScoped<IAccountingTransactionRepository, AccountingTransactionRepository>();
+builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 //services
 builder.Services.AddScoped<IAddCashAccountService, AddCashAccountService>();
 builder.Services.AddScoped<ICashAccountQueryService, CashAccountQueryService>();
@@ -50,6 +57,8 @@ builder.Services.AddScoped<ISummaryExpenseCategoryQueryService, SummaryExpenseCa
 builder.Services.AddScoped<IAddTransactionalExpenseCategoryService, AddTransactionalExpenseCategoryService>();
 builder.Services.AddScoped<IAddExpenseAccountService, AddExpenseAccountService>();
 builder.Services.AddScoped<IExpenseAccountQueryService, ExpenseAccountQueryService>();
+builder.Services.AddScoped<IAddNewExpenseService, AddNewExpenseService>();
+builder.Services.AddScoped<IExpenseQueryService, ExpenseQueryService>();
 
 var app = builder.Build();
 app.UseCors();
