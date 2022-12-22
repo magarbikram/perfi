@@ -1,4 +1,5 @@
-﻿using Perfi.Core.Expenses;
+﻿using Perfi.Api.Models;
+using Perfi.Core.Expenses;
 
 namespace Perfi.Api.Responses
 {
@@ -7,27 +8,30 @@ namespace Perfi.Api.Responses
         public int Id { get; private set; }
         public string Description { get; private set; }
         public long TransactionDateUnixTimeStamp { get; private set; }
-        public string ExpenseCategoryCode { get; private set; }
+        public ListTransactionalExpenseCategoryResponse ExpenseCategory { get; private set; }
         public ExpensePaymentMethodResponse ExpensePaymentMethod { get; private set; }
-
-        public static ListExpenseResponse From(Expense expense)
+        public MoneyResponse Amount { get; private set; }
+        public static ListExpenseResponse From(ExpenseWithTransactionCategoryDetail expenseWithTransactionCategoryDetail)
         {
+            Expense expense = expenseWithTransactionCategoryDetail.Expense;
+            TransactionalExpenseCategory transactionalExpenseCategory = expenseWithTransactionCategoryDetail.TransactionalExpenseCategory;
             return new ListExpenseResponse
             {
                 Id = expense.Id,
                 Description = expense.Description,
                 TransactionDateUnixTimeStamp = expense.TransactionDate.ToUnixTimeMilliseconds(),
-                ExpenseCategoryCode = expense.ExpenseCategoryCode.Value,
-                ExpensePaymentMethod = ExpensePaymentMethodResponse.From(expense.PaymentMethod)
+                ExpenseCategory = ListTransactionalExpenseCategoryResponse.From(transactionalExpenseCategory),
+                ExpensePaymentMethod = ExpensePaymentMethodResponse.From(expense.PaymentMethod),
+                Amount = MoneyResponse.From(expense.Amount),
             };
         }
 
-        public static List<ListExpenseResponse> From(IEnumerable<Expense> currentExpenses)
+        internal static IEnumerable<ListExpenseResponse> From(IEnumerable<ExpenseWithTransactionCategoryDetail> expenseWithTransactionCategoryDetails)
         {
-            List<ListExpenseResponse> listExpenseResponses = new(currentExpenses.Count());
-            foreach (Expense expense in currentExpenses)
+            List<ListExpenseResponse> listExpenseResponses = new(expenseWithTransactionCategoryDetails.Count());
+            foreach (ExpenseWithTransactionCategoryDetail expenseWithTransactionCategoryDetail in expenseWithTransactionCategoryDetails)
             {
-                listExpenseResponses.Add(From(expense));
+                listExpenseResponses.Add(From(expenseWithTransactionCategoryDetail));
             }
             return listExpenseResponses;
         }

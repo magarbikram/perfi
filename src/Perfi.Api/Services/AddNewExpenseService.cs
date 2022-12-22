@@ -44,7 +44,8 @@ namespace Perfi.Api.Services
             Expense expense = await AddNewExpenseAsync(addNewExpenseCommand);
             AccountingTransaction accountingTransaction = await AddAccountingTransactionRelatedToExpenseAsync(expense);
             await SetAccountingTransactionInExpense(expense, accountingTransaction);
-            return NewExpenseAddedResponse.From(expense);
+            TransactionalExpenseCategory transactionalExpenseCategory = await FindTransactionalExpenseCategoryByCodeAsync(expense.ExpenseCategoryCode);
+            return NewExpenseAddedResponse.From(expense, transactionalExpenseCategory);
         }
 
         private async Task SetAccountingTransactionInExpense(Expense expense, AccountingTransaction accountingTransaction)

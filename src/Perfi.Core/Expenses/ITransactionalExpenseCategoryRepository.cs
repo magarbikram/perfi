@@ -7,5 +7,6 @@ namespace Perfi.Core.Expenses
     {
         TransactionalExpenseCategory Add(TransactionalExpenseCategory category);
         Task<Maybe<TransactionalExpenseCategory>> GetByCodeAsync(ExpenseCategoryCode expenseCategoryCode);
+        Task<IEnumerable<TransactionalExpenseCategory>> GetByCodesAsync(IEnumerable<ExpenseCategoryCode> expenseCategoryCodes);
     }
 }

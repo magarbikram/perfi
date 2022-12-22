@@ -29,5 +29,10 @@ namespace Perfi.Infrastructure.Database.Repositories
             }
             return transactionalExpenseCategory;
         }
+
+        public async Task<IEnumerable<TransactionalExpenseCategory>> GetByCodesAsync(IEnumerable<ExpenseCategoryCode> expenseCategoryCodes)
+        {
+            return await _appDbContext.TransactionalExpenseCategories.Where(tec => expenseCategoryCodes.Contains(tec.Code)).ToListAsync();
+        }
     }
 }
