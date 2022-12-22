@@ -4,6 +4,7 @@ namespace Perfi.Api.Responses
 {
     public class ListExpenseResponse
     {
+        public int Id { get; private set; }
         public string Description { get; private set; }
         public long TransactionDateUnixTimeStamp { get; private set; }
         public string ExpenseCategoryCode { get; private set; }
@@ -13,6 +14,7 @@ namespace Perfi.Api.Responses
         {
             return new ListExpenseResponse
             {
+                Id = expense.Id,
                 Description = expense.Description,
                 TransactionDateUnixTimeStamp = expense.TransactionDate.ToUnixTimeMilliseconds(),
                 ExpenseCategoryCode = expense.ExpenseCategoryCode.Value,

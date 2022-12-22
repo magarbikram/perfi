@@ -28,10 +28,17 @@ namespace Perfi.Api.Controllers
             return Created("", newExpenseAddedResponse);
         }
 
-        [HttpGet]
+        [HttpGet("CurrentPeriod")]
         public async Task<ActionResult<IEnumerable<ListExpenseResponse>>> ListCurrentExpensesAsync()
         {
             IEnumerable<ListExpenseResponse> listExpenseResponses = await _expenseQueryService.GetCurrentExpensesAsync();
+            return Ok(listExpenseResponses);
+        }
+
+        [HttpGet("CurrentPeriod/TopTen")]
+        public async Task<ActionResult<IEnumerable<ListExpenseResponse>>> ListCurrentTop10ExpensesAsync()
+        {
+            IEnumerable<ListExpenseResponse> listExpenseResponses = await _expenseQueryService.GetCurrentTop10ExpensesAsync();
             return Ok(listExpenseResponses);
         }
     }

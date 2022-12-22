@@ -11,5 +11,6 @@ namespace Perfi.Core.Expenses
     {
         Expense Add(Expense expense);
         Task<IEnumerable<Expense>> GetAllForTransactionPeriodAsync(TransactionPeriod transactionPeriod);
+        Task<IEnumerable<Expense>> GetTop10ExpensesForTransactionPeriodAsync(TransactionPeriod transactionPeriod);
     }
 }

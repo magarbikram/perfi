@@ -17,5 +17,12 @@ namespace Perfi.Api.Services
             IEnumerable<Expense> currentExpenses = await _expenseRepository.GetAllForTransactionPeriodAsync(transactionPeriod: currentTransactionPeriod);
             return ListExpenseResponse.From(currentExpenses);
         }
+
+        public async Task<IEnumerable<ListExpenseResponse>> GetCurrentTop10ExpensesAsync()
+        {
+            TransactionPeriod currentTransactionPeriod = TransactionPeriod.For(DateTimeOffset.Now);
+            IEnumerable<Expense> currentExpenses = await _expenseRepository.GetTop10ExpensesForTransactionPeriodAsync(transactionPeriod: currentTransactionPeriod);
+            return ListExpenseResponse.From(currentExpenses);
+        }
     }
 }

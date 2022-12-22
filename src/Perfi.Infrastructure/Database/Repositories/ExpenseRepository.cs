@@ -27,5 +27,15 @@ namespace Perfi.Infrastructure.Database.Repositories
         {
             return await _appDbContext.Expenses.Include(exp => exp.PaymentMethod).Where(exp => exp.TransactionPeriod == transactionPeriod).ToListAsync();
         }
+
+        public async Task<IEnumerable<Expense>> GetTop10ExpensesForTransactionPeriodAsync(TransactionPeriod transactionPeriod)
+        {
+            return await _appDbContext.Expenses
+                                      .Include(exp => exp.PaymentMethod)
+                                      .Where(exp => exp.TransactionPeriod == transactionPeriod)
+                                      .OrderByDescending(exp => exp.TransactionDate)
+                                      .Take(10)
+                                      .ToListAsync();
+        }
     }
 }
