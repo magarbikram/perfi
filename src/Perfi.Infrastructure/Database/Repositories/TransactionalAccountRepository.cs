@@ -54,5 +54,10 @@ namespace Perfi.Infrastructure.Database.Repositories
             }
             return transactionalAccount;
         }
+
+        public async Task<int> CountWithSummaryAccountNumberAsync(AccountNumber summaryAccountNumber)
+        {
+            return await _appDbContext.TransactionalAccounts.CountAsync(ta => ta.ParentAccountNumber == summaryAccountNumber);
+        }
     }
 }

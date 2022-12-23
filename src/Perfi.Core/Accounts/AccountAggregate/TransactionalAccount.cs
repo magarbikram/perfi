@@ -38,5 +38,14 @@ namespace Perfi.Core.Accounts.AccountAggregate
                 ParentAccountNumber = parentAccountNumber
             };
         }
+
+        public static TransactionalAccount NewRevenueAccount(AccountNumber accountNumber, string name, AccountNumber parentAccountNumber)
+        {
+            GuardAgainstInvalidName(name);
+            return new(accountNumber, name, AccountCategory.Revenues)
+            {
+                ParentAccountNumber = parentAccountNumber
+            };
+        }
     }
 }

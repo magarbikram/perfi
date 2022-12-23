@@ -5,6 +5,7 @@ using Perfi.Core.Accounts.AccountAggregate;
 using Perfi.Core.Accounts.AccountingTransactionAggregate;
 using Perfi.Core.Accounts.CashAccountAggregate;
 using Perfi.Core.Accounts.CreditCardAggregate;
+using Perfi.Core.Accounts.Jobs;
 using Perfi.Core.Accounts.LoanAggregate;
 using Perfi.Core.Expenses;
 using Perfi.Infrastructure.Database;
@@ -45,6 +46,8 @@ builder.Services.AddScoped<ISummaryExpenseCategoryRepository, SummaryExpenseCate
 builder.Services.AddScoped<ITransactionalExpenseCategoryRepository, TransactionalExpenseCategoryRepository>();
 builder.Services.AddScoped<IAccountingTransactionRepository, AccountingTransactionRepository>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
+builder.Services.AddScoped<IJobRepository, JobRepository>();
+
 //services
 builder.Services.AddScoped<IAddCashAccountService, AddCashAccountService>();
 builder.Services.AddScoped<ICashAccountQueryService, CashAccountQueryService>();
@@ -59,6 +62,8 @@ builder.Services.AddScoped<IAddExpenseAccountService, AddExpenseAccountService>(
 builder.Services.AddScoped<IExpenseAccountQueryService, ExpenseAccountQueryService>();
 builder.Services.AddScoped<IAddNewExpenseService, AddNewExpenseService>();
 builder.Services.AddScoped<IExpenseQueryService, ExpenseQueryService>();
+builder.Services.AddScoped<IAddJobService, AddJobService>();
+builder.Services.AddScoped<IGetNextAccountNumberService, GetNextAccountNumberService>();
 
 var app = builder.Build();
 app.UseCors();
