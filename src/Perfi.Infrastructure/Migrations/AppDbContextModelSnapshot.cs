@@ -188,60 +188,6 @@ namespace Perfi.Infrastructure.Migrations
                     b.ToTable("CreditCardAccount", (string)null);
                 });
 
-            modelBuilder.Entity("Perfi.Core.Accounts.Jobs.Job", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AssociatedAccountNumber")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<string>("Employee")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
-
-                    b.Property<string>("JobHolder")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Job", (string)null);
-                });
-
-            modelBuilder.Entity("Perfi.Core.Accounts.Jobs.JobIncomeSplit", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CashAccountNumber")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<int?>("JobId")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("SplitRemainderAmount")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("JobId");
-
-                    b.ToTable("JobIncomeSplit", (string)null);
-                });
-
             modelBuilder.Entity("Perfi.Core.Accounts.LoanAggregate.Loan", b =>
                 {
                     b.Property<int>("Id")
@@ -271,6 +217,77 @@ namespace Perfi.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Loan", (string)null);
+                });
+
+            modelBuilder.Entity("Perfi.Core.Earnings.IncomeDocument", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("DocumentDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("TransactionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("TransactionId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TransactionPeriod")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TransactionDate");
+
+                    b.HasIndex("TransactionPeriod");
+
+                    b.ToTable("IncomeDocument", (string)null);
+                });
+
+            modelBuilder.Entity("Perfi.Core.Earnings.IncomeSources.IncomeSource", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AssociatedAccountNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("IncomeSource", (string)null);
+                });
+
+            modelBuilder.Entity("Perfi.Core.Earnings.PaymentDeposition", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PaymentDeposition", (string)null);
+
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("Perfi.Core.Expenses.Expense", b =>
@@ -382,6 +399,31 @@ namespace Perfi.Infrastructure.Migrations
                     b.HasDiscriminator().HasValue("Transactional");
                 });
 
+            modelBuilder.Entity("Perfi.Core.Earnings.PaymenDepositionToCashAccount", b =>
+                {
+                    b.HasBaseType("Perfi.Core.Earnings.PaymentDeposition");
+
+                    b.Property<string>("BankName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("CashAccountId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CashAccountNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.ToTable("PaymenDepositionToCashAccount", (string)null);
+                });
+
             modelBuilder.Entity("Perfi.Core.Expenses.SummaryExpenseCategory", b =>
                 {
                     b.HasBaseType("Perfi.Core.Expenses.ExpenseCategory");
@@ -465,10 +507,11 @@ namespace Perfi.Infrastructure.Migrations
                                 .HasColumnType("integer");
 
                             b1.Property<string>("Currency")
+                                .IsRequired()
                                 .HasMaxLength(4)
                                 .HasColumnType("character varying(4)");
 
-                            b1.Property<decimal?>("Value")
+                            b1.Property<decimal>("Value")
                                 .HasColumnType("numeric");
 
                             b1.HasKey("AccountingEntryId");
@@ -485,10 +528,11 @@ namespace Perfi.Infrastructure.Migrations
                                 .HasColumnType("integer");
 
                             b1.Property<string>("Currency")
+                                .IsRequired()
                                 .HasMaxLength(4)
                                 .HasColumnType("character varying(4)");
 
-                            b1.Property<decimal?>("Value")
+                            b1.Property<decimal>("Value")
                                 .HasColumnType("numeric");
 
                             b1.HasKey("AccountingEntryId");
@@ -499,11 +543,9 @@ namespace Perfi.Infrastructure.Migrations
                                 .HasForeignKey("AccountingEntryId");
                         });
 
-                    b.Navigation("CreditAmount")
-                        .IsRequired();
+                    b.Navigation("CreditAmount");
 
-                    b.Navigation("DebitAmount")
-                        .IsRequired();
+                    b.Navigation("DebitAmount");
                 });
 
             modelBuilder.Entity("Perfi.Core.Accounts.AccountAggregate.Account", b =>
@@ -512,35 +554,6 @@ namespace Perfi.Infrastructure.Migrations
                         .WithMany("Components")
                         .HasForeignKey("ParentAccountNumber")
                         .HasPrincipalKey("Number");
-                });
-
-            modelBuilder.Entity("Perfi.Core.Accounts.Jobs.JobIncomeSplit", b =>
-                {
-                    b.HasOne("Perfi.Core.Accounts.Jobs.Job", null)
-                        .WithMany("IncomeSplits")
-                        .HasForeignKey("JobId");
-
-                    b.OwnsOne("Perfi.Core.Accounting.Money", "SplitAmount", b1 =>
-                        {
-                            b1.Property<int>("JobIncomeSplitId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("Currency")
-                                .HasMaxLength(5)
-                                .HasColumnType("character varying(5)");
-
-                            b1.Property<decimal?>("Value")
-                                .HasColumnType("numeric");
-
-                            b1.HasKey("JobIncomeSplitId");
-
-                            b1.ToTable("JobIncomeSplit");
-
-                            b1.WithOwner()
-                                .HasForeignKey("JobIncomeSplitId");
-                        });
-
-                    b.Navigation("SplitAmount");
                 });
 
             modelBuilder.Entity("Perfi.Core.Accounts.LoanAggregate.Loan", b =>
@@ -555,8 +568,7 @@ namespace Perfi.Infrastructure.Migrations
                                 .HasMaxLength(5)
                                 .HasColumnType("character varying(5)");
 
-                            b1.Property<decimal?>("Value")
-                                .IsRequired()
+                            b1.Property<decimal>("Value")
                                 .HasColumnType("numeric");
 
                             b1.HasKey("LoanId");
@@ -568,6 +580,66 @@ namespace Perfi.Infrastructure.Migrations
                         });
 
                     b.Navigation("LoanAmount")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Perfi.Core.Earnings.IncomeDocument", b =>
+                {
+                    b.OwnsOne("Perfi.Core.Accounting.Money", "Amount", b1 =>
+                        {
+                            b1.Property<int>("IncomeDocumentId")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("Currency")
+                                .IsRequired()
+                                .HasMaxLength(5)
+                                .HasColumnType("character varying(5)");
+
+                            b1.Property<decimal>("Value")
+                                .HasColumnType("numeric");
+
+                            b1.HasKey("IncomeDocumentId");
+
+                            b1.ToTable("IncomeDocument");
+
+                            b1.WithOwner()
+                                .HasForeignKey("IncomeDocumentId");
+                        });
+
+                    b.OwnsOne("Perfi.Core.Earnings.Source", "Source", b1 =>
+                        {
+                            b1.Property<int>("IncomeDocumentId")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("IncomeSourceId")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasMaxLength(150)
+                                .HasColumnType("character varying(150)");
+
+                            b1.HasKey("IncomeDocumentId");
+
+                            b1.ToTable("IncomeDocument");
+
+                            b1.WithOwner()
+                                .HasForeignKey("IncomeDocumentId");
+                        });
+
+                    b.Navigation("Amount")
+                        .IsRequired();
+
+                    b.Navigation("Source")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Perfi.Core.Earnings.PaymentDeposition", b =>
+                {
+                    b.HasOne("Perfi.Core.Earnings.IncomeDocument", null)
+                        .WithOne("PaymentDeposition")
+                        .HasForeignKey("Perfi.Core.Earnings.PaymentDeposition", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -583,7 +655,7 @@ namespace Perfi.Infrastructure.Migrations
                                 .HasMaxLength(4)
                                 .HasColumnType("character varying(4)");
 
-                            b1.Property<decimal?>("Value")
+                            b1.Property<decimal>("Value")
                                 .HasColumnType("numeric");
 
                             b1.HasKey("ExpenseId");
@@ -603,6 +675,15 @@ namespace Perfi.Infrastructure.Migrations
                     b.HasOne("Perfi.Core.Expenses.Expense", null)
                         .WithOne("PaymentMethod")
                         .HasForeignKey("Perfi.Core.Expenses.ExpensePaymentMethod", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Perfi.Core.Earnings.PaymenDepositionToCashAccount", b =>
+                {
+                    b.HasOne("Perfi.Core.Earnings.PaymentDeposition", null)
+                        .WithOne()
+                        .HasForeignKey("Perfi.Core.Earnings.PaymenDepositionToCashAccount", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -640,9 +721,10 @@ namespace Perfi.Infrastructure.Migrations
                     b.Navigation("AccountingEntries");
                 });
 
-            modelBuilder.Entity("Perfi.Core.Accounts.Jobs.Job", b =>
+            modelBuilder.Entity("Perfi.Core.Earnings.IncomeDocument", b =>
                 {
-                    b.Navigation("IncomeSplits");
+                    b.Navigation("PaymentDeposition")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Perfi.Core.Expenses.Expense", b =>

@@ -5,9 +5,7 @@ namespace Perfi.Api.Commands
 {
     public class JobIncomeSplitCommand : IValidatableObject
     {
-        [Required]
-        [MaxLength(AccountNumber.MaxLength)]
-        public string CashAccountNumber { get; set; }
+        public int CashAccountId { get; set; }
         public bool SplitRemainderAmount { get; set; }
         public decimal? SplitAmount { get; set; }
 

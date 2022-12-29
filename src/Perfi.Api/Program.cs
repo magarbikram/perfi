@@ -5,8 +5,9 @@ using Perfi.Core.Accounts.AccountAggregate;
 using Perfi.Core.Accounts.AccountingTransactionAggregate;
 using Perfi.Core.Accounts.CashAccountAggregate;
 using Perfi.Core.Accounts.CreditCardAggregate;
-using Perfi.Core.Accounts.Jobs;
 using Perfi.Core.Accounts.LoanAggregate;
+using Perfi.Core.Earnings;
+using Perfi.Core.Earnings.IncomeSources;
 using Perfi.Core.Expenses;
 using Perfi.Infrastructure.Database;
 using Perfi.Infrastructure.Database.Repositories;
@@ -46,7 +47,8 @@ builder.Services.AddScoped<ISummaryExpenseCategoryRepository, SummaryExpenseCate
 builder.Services.AddScoped<ITransactionalExpenseCategoryRepository, TransactionalExpenseCategoryRepository>();
 builder.Services.AddScoped<IAccountingTransactionRepository, AccountingTransactionRepository>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
-builder.Services.AddScoped<IJobRepository, JobRepository>();
+builder.Services.AddScoped<IIncomeSourceRepository, IncomeSourceRepository>();
+builder.Services.AddScoped<IIncomeDocumentRepository, IncomeDocumentRepository>();
 
 //services
 builder.Services.AddScoped<IAddCashAccountService, AddCashAccountService>();
@@ -62,8 +64,12 @@ builder.Services.AddScoped<IAddExpenseAccountService, AddExpenseAccountService>(
 builder.Services.AddScoped<IExpenseAccountQueryService, ExpenseAccountQueryService>();
 builder.Services.AddScoped<IAddNewExpenseService, AddNewExpenseService>();
 builder.Services.AddScoped<IExpenseQueryService, ExpenseQueryService>();
-builder.Services.AddScoped<IAddJobService, AddJobService>();
 builder.Services.AddScoped<IGetNextAccountNumberService, GetNextAccountNumberService>();
+builder.Services.AddScoped<IAddNewIncomeSourceService, AddNewIncomeSourceService>();
+builder.Services.AddScoped<IIncomeSourceQueryService, IncomeSourceQueryService>();
+builder.Services.AddScoped<IAddNewIncomeService, AddNewIncomeService>();
+builder.Services.AddScoped<IIncomeDocumentQueryService, IncomeDocumentQueryService>();
+builder.Services.AddScoped<ICashFlowReportService, CashFlowReportService>();
 
 var app = builder.Build();
 app.UseCors();

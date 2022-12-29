@@ -4,6 +4,6 @@ namespace Perfi.Api.Services
 {
     public interface IGetNextAccountNumberService
     {
-        Task<AccountNumber> GetNext(AccountNumber summaryAccountNumber);
+        Task<AccountNumber> GetNextAsync(AccountNumber summaryAccountNumber);
     }
 }

@@ -1,6 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using Perfi.Api.Commands;
-using Perfi.Api.Exceptions;
+﻿using Perfi.Api.Commands;
 using Perfi.Api.Responses;
 using Perfi.Core.Accounts.AccountAggregate;
 using Perfi.Core.Accounts.CashAccountAggregate;
@@ -11,13 +9,16 @@ namespace Perfi.Api.Services
     {
         private readonly ITransactionalAccountRepository _transactionalAccountRepository;
         private readonly ICashAccountRepository _cashAccountRepository;
+        private readonly IGetNextAccountNumberService _getNextAccountNumberService;
 
         public AddCashAccountService(
             ITransactionalAccountRepository transactionalAccountRepository,
-            ICashAccountRepository cashAccountRepository)
+            ICashAccountRepository cashAccountRepository,
+            IGetNextAccountNumberService getNextAccountNumberService)
         {
             _transactionalAccountRepository = transactionalAccountRepository;
             _cashAccountRepository = cashAccountRepository;
+            _getNextAccountNumberService = getNextAccountNumberService;
         }
         public async Task<NewCashAccountAddedResponse> AddAsync(AddNewCashAccountCommand addNewCashAccountCommand)
         {
@@ -31,7 +32,8 @@ namespace Perfi.Api.Services
         private async Task<TransactionalAccount> AddAssociatedTransactionalAccountAsync(AddNewCashAccountCommand addNewCashAccountCommand)
         {
             AccountNumber bankCashSummaryAccountNumber = AccountNumber.From(SummaryAccount.DefaultAccountNumbers.BankCashAccount);
-            TransactionalAccount newBankCashAccount = TransactionalAccount.NewAssetAccount(number: addNewCashAccountCommand.Code, name: addNewCashAccountCommand.Name, parentAccountNumber: bankCashSummaryAccountNumber);
+            AccountNumber newCashAccountNumber = await _getNextAccountNumberService.GetNextAsync(bankCashSummaryAccountNumber);
+            TransactionalAccount newBankCashAccount = TransactionalAccount.NewAssetAccount(newCashAccountNumber, name: addNewCashAccountCommand.Name, parentAccountNumber: bankCashSummaryAccountNumber);
             newBankCashAccount = _transactionalAccountRepository.Add(newBankCashAccount);
             return newBankCashAccount;
         }

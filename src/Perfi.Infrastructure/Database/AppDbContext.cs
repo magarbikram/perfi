@@ -2,8 +2,9 @@
 using Perfi.Core.Accounts.AccountAggregate;
 using Perfi.Core.Accounts.CashAccountAggregate;
 using Perfi.Core.Accounts.CreditCardAggregate;
-using Perfi.Core.Accounts.Jobs;
 using Perfi.Core.Accounts.LoanAggregate;
+using Perfi.Core.Earnings;
+using Perfi.Core.Earnings.IncomeSources;
 using Perfi.Core.Expenses;
 using Perfi.SharedKernel;
 using System.Reflection;
@@ -20,7 +21,8 @@ namespace Perfi.Infrastructure.Database
         public DbSet<TransactionalExpenseCategory> TransactionalExpenseCategories { get; set; }
         public DbSet<Expense> Expenses { get; set; }
         public DbSet<Loan> Loans { get; set; }
-        public DbSet<Job> Jobs { get; set; }
+        public DbSet<IncomeSource> IncomeSources { get; set; }
+        public DbSet<IncomeDocument> IncomeDocuments { get; set; }
         public AppDbContext(DbContextOptions options) : base(options)
         {
         }

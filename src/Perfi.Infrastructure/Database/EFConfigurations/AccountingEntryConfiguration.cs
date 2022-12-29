@@ -19,14 +19,14 @@ namespace Perfi.Infrastructure.Database.EFConfigurations
 
             builder.OwnsOne(x => x.DebitAmount, da =>
             {
-                da.Property(x => x.Currency).HasMaxLength(4).IsRequired(false);
-                da.Property(x => x.Value).IsRequired(false);
+                da.Property(x => x.Currency).HasMaxLength(4);
+                da.Property(x => x.Value);
             });
 
             builder.OwnsOne(x => x.CreditAmount, da =>
             {
-                da.Property(x => x.Currency).HasMaxLength(4).IsRequired(false);
-                da.Property(x => x.Value).IsRequired(false);
+                da.Property(x => x.Currency).HasMaxLength(4);
+                da.Property(x => x.Value);
             });
 
             builder.HasIndex(x => x.TransactionDate).IsUnique(false);

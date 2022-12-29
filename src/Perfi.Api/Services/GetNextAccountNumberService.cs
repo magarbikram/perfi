@@ -11,7 +11,7 @@ namespace Perfi.Api.Services
             _transactionalAccountRepository = transactionalAccountRepository;
         }
 
-        public async Task<AccountNumber> GetNext(AccountNumber summaryAccountNumber)
+        public async Task<AccountNumber> GetNextAsync(AccountNumber summaryAccountNumber)
         {
             int count = await _transactionalAccountRepository.CountWithSummaryAccountNumberAsync(summaryAccountNumber);
             return AccountNumber.Next(summaryAccountNumber, count);

@@ -1,16 +1,10 @@
-﻿using Perfi.Core.Accounts.AccountAggregate;
-using Perfi.Core.Accounts.CashAccountAggregate;
-using Perfi.Core.Accounts.CreditCardAggregate;
+﻿using Perfi.Core.Accounts.CreditCardAggregate;
 using System.ComponentModel.DataAnnotations;
 
 namespace Perfi.Api.Commands
 {
     public class AddNewCreditCardAccountCommand
     {
-        [Required]
-        [MaxLength(AccountNumber.MaxLength)]
-        public string Code { get; set; }
-
         [Required]
         [MaxLength(CreditCardAccount.MaxLengths.Name)]
         public string Name { get; set; }

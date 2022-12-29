@@ -17,7 +17,7 @@ namespace Perfi.Core.Accounts.AccountAggregate
 
         public static AccountNumber Next(AccountNumber summaryAccountNumber, int count)
         {
-            return From($"{summaryAccountNumber.Value}-{count + 1,2}");
+            return From($"{summaryAccountNumber.Value}-{(count + 1).ToString().PadLeft(3, '0')}");
         }
 
         protected override IEnumerable<object> GetEqualityComponents()

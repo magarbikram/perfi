@@ -7,6 +7,12 @@ namespace Perfi.Core.Expenses
     {
         public const int MaxLength = 20;
         public string Value { get; private set; }
+
+        public static TransactionPeriod CurrentPeriod()
+        {
+            return For(DateTimeOffset.Now);
+        }
+
         public static TransactionPeriod For(DateTimeOffset transactionDate)
         {
             return new TransactionPeriod

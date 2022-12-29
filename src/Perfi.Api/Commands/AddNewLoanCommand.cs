@@ -7,10 +7,6 @@ namespace Perfi.Api.Commands
     public class AddNewLoanCommand : IValidatableObject
     {
         [Required]
-        [MaxLength(AccountNumber.MaxLength)]
-        public string Code { get; set; }
-
-        [Required]
         [MaxLength(Loan.MaxLengths.Name)]
         public string Name { get; set; }
 

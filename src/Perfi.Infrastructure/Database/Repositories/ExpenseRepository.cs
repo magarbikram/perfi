@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Perfi.Core.Accounting;
 using Perfi.Core.Expenses;
 using Perfi.SharedKernel;
 using System;
@@ -36,6 +37,15 @@ namespace Perfi.Infrastructure.Database.Repositories
                                       .OrderByDescending(exp => exp.TransactionDate)
                                       .Take(10)
                                       .ToListAsync();
+        }
+
+        public async Task<Money> GetTotalExpenseAmountForPeriodAsync(TransactionPeriod currentTransactionPeriod)
+        {
+            decimal totalExpenseAmountValue = await _appDbContext.Expenses
+                                                        .Where(exp => exp.TransactionPeriod == currentTransactionPeriod)
+                                                        .Select(inc => inc.Amount)
+                                                        .SumAsync(exa => exa.Value);
+            return Money.UsdFrom(totalExpenseAmountValue);
         }
     }
 }

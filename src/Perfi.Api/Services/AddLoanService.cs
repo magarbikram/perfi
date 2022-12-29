@@ -10,27 +10,31 @@ namespace Perfi.Api.Services
     {
         private readonly ITransactionalAccountRepository _transactionalAccountRepository;
         private readonly ILoanRepository _loanRepository;
+        private readonly IGetNextAccountNumberService _getNextAccountNumberService;
 
         public AddLoanService(
             ITransactionalAccountRepository transactionalAccountRepository,
-            ILoanRepository loanRepository)
+            ILoanRepository loanRepository,
+            IGetNextAccountNumberService getNextAccountNumberService)
         {
             _transactionalAccountRepository = transactionalAccountRepository;
             _loanRepository = loanRepository;
+            _getNextAccountNumberService = getNextAccountNumberService;
         }
         public async Task<NewLoanAddedResponse> AddAsync(AddNewLoanCommand addNewLoanCommand)
         {
-            TransactionalAccount associatedTransactionalAccount = AddAssociatedTransactionalAccountAsync(addNewLoanCommand);
+            TransactionalAccount associatedTransactionalAccount = await AddAssociatedTransactionalAccountAsync(addNewLoanCommand);
             Loan loan = Loan.From(addNewLoanCommand.Name, addNewLoanCommand.LoanProvider, loanAmount: Money.From(addNewLoanCommand.LoanAmount, "USD"), InterestRate.From(addNewLoanCommand.InterestRate), associatedTransactionalAccount);
             _loanRepository.Add(loan);
             await _loanRepository.UnitOfWork.SaveChangesAsync();
             return NewLoanAddedResponse.From(loan);
         }
 
-        private TransactionalAccount AddAssociatedTransactionalAccountAsync(AddNewLoanCommand addNewLoanCommand)
+        private async Task<TransactionalAccount> AddAssociatedTransactionalAccountAsync(AddNewLoanCommand addNewLoanCommand)
         {
             AccountNumber bankCashSummaryAccountNumber = AccountNumber.From(SummaryAccount.DefaultAccountNumbers.LoanAccount);
-            TransactionalAccount newBankLoan = TransactionalAccount.NewLiabilityAccount(number: addNewLoanCommand.Code, name: addNewLoanCommand.Name, parentAccountNumber: bankCashSummaryAccountNumber);
+            AccountNumber newLoanAccountNumber = await _getNextAccountNumberService.GetNextAsync(bankCashSummaryAccountNumber);
+            TransactionalAccount newBankLoan = TransactionalAccount.NewLiabilityAccount(newLoanAccountNumber, name: addNewLoanCommand.Name, parentAccountNumber: bankCashSummaryAccountNumber);
             newBankLoan = _transactionalAccountRepository.Add(newBankLoan);
             return newBankLoan;
         }

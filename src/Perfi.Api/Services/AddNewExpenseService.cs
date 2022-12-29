@@ -66,7 +66,7 @@ namespace Perfi.Api.Services
 
         private async Task<Expense> AddCreditCardExpenseAsync(AddNewExpenseCommand addNewExpenseCommand)
         {
-            CreditCardAccount creditCardAccount = await FindCreditCardAccountAsync(addNewExpenseCommand.PaymentMethod.CreditCardAccountId.Value);
+            CreditCardAccount creditCardAccount = await FindCreditCardAccountAsync(addNewExpenseCommand.PaymentMethod.CreditCardAccountId!.Value);
             Expense newExpense = Expense.NewCreditCardExpense(description: addNewExpenseCommand.Description,
                                              transactionDate: DateTimeOffset.FromUnixTimeMilliseconds(addNewExpenseCommand.TransactionDateUnixTimeStamp),
                                              expenseCategoryCode: ExpenseCategoryCode.From(addNewExpenseCommand.ExpenseCategoryCode),
@@ -82,7 +82,7 @@ namespace Perfi.Api.Services
 
         private async Task<Expense> AddCashAccountExpenseAsync(AddNewExpenseCommand addNewExpenseCommand)
         {
-            CashAccount cashAccount = await FindCashAccountByIdAsync(addNewExpenseCommand.PaymentMethod.CashAccountId.Value);
+            CashAccount cashAccount = await FindCashAccountByIdAsync(addNewExpenseCommand.PaymentMethod.CashAccountId!.Value);
             Expense newExpense = Expense.NewCashAccountExpense(description: addNewExpenseCommand.Description,
                                              transactionDate: DateTimeOffset.FromUnixTimeMilliseconds(addNewExpenseCommand.TransactionDateUnixTimeStamp),
                                              expenseCategoryCode: ExpenseCategoryCode.From(addNewExpenseCommand.ExpenseCategoryCode),

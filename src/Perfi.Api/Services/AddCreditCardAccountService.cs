@@ -11,27 +11,31 @@ namespace Perfi.Api.Services
     {
         private readonly ITransactionalAccountRepository _transactionalAccountRepository;
         private readonly ICreditCardAccountRepository _creditCardAccountRepository;
+        private readonly IGetNextAccountNumberService _getNextAccountNumberService;
 
         public AddCreditCardAccountService(
             ITransactionalAccountRepository transactionalAccountRepository,
-            ICreditCardAccountRepository cashAccountRepository)
+            ICreditCardAccountRepository cashAccountRepository,
+            IGetNextAccountNumberService getNextAccountNumberService)
         {
             _transactionalAccountRepository = transactionalAccountRepository;
             _creditCardAccountRepository = cashAccountRepository;
+            _getNextAccountNumberService = getNextAccountNumberService;
         }
         public async Task<NewCreditCardAccountAddedResponse> AddAsync(AddNewCreditCardAccountCommand addNewCreditCardAccountCommand)
         {
-            TransactionalAccount associatedTransactionalAccount = AddAssociatedTransactionalAccount(addNewCreditCardAccountCommand);
+            TransactionalAccount associatedTransactionalAccount = await AddAssociatedTransactionalAccountAsync(addNewCreditCardAccountCommand);
             CreditCardAccount creditCardAccount = CreditCardAccount.From(addNewCreditCardAccountCommand.Name, addNewCreditCardAccountCommand.CreditorName, addNewCreditCardAccountCommand.LastFourDigits, associatedTransactionalAccount);
             _creditCardAccountRepository.Add(creditCardAccount);
             await _creditCardAccountRepository.UnitOfWork.SaveChangesAsync();
             return NewCreditCardAccountAddedResponse.From(creditCardAccount);
         }
 
-        private TransactionalAccount AddAssociatedTransactionalAccount(AddNewCreditCardAccountCommand addNewCreditCardAccountCommand)
+        private async Task<TransactionalAccount> AddAssociatedTransactionalAccountAsync(AddNewCreditCardAccountCommand addNewCreditCardAccountCommand)
         {
-            AccountNumber CreditCardSummaryAccountNumber = AccountNumber.From(SummaryAccount.DefaultAccountNumbers.CreditCardAccount);
-            TransactionalAccount newCreditCardAccount = TransactionalAccount.NewLiabilityAccount(number: addNewCreditCardAccountCommand.Code, name: addNewCreditCardAccountCommand.Name, parentAccountNumber: CreditCardSummaryAccountNumber);
+            AccountNumber creditCardSummaryAccountNumber = AccountNumber.From(SummaryAccount.DefaultAccountNumbers.CreditCardAccount);
+            AccountNumber newCreditCardAccountNumber = await _getNextAccountNumberService.GetNextAsync(creditCardSummaryAccountNumber);
+            TransactionalAccount newCreditCardAccount = TransactionalAccount.NewLiabilityAccount(newCreditCardAccountNumber, name: addNewCreditCardAccountCommand.Name, parentAccountNumber: creditCardSummaryAccountNumber);
             newCreditCardAccount = _transactionalAccountRepository.Add(newCreditCardAccount);
             return newCreditCardAccount;
         }

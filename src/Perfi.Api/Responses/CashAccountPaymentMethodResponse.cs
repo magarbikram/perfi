@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using Perfi.Core.Accounts.CashAccountAggregate;
+using Perfi.Core.Earnings;
 using Perfi.Core.Expenses;
 
 namespace Perfi.Api.Responses
@@ -18,6 +19,16 @@ namespace Perfi.Api.Responses
         {
             Guard.Against.Null(cashAccountExpensePaymentMethod, nameof(cashAccountExpensePaymentMethod));
             return new CashAccountPaymentMethodResponse { Name = cashAccountExpensePaymentMethod.Name, BankName = cashAccountExpensePaymentMethod.BankName };
+        }
+
+        internal static CashAccountPaymentMethodResponse From(PaymenDepositionToCashAccount paymentMethod)
+        {
+            Guard.Against.Null(paymentMethod);
+            return new CashAccountPaymentMethodResponse
+            {
+                Name = paymentMethod.Name,
+                BankName = paymentMethod.BankName,
+            };
         }
     }
 }
