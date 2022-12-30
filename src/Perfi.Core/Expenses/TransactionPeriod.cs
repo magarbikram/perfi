@@ -28,6 +28,11 @@ namespace Perfi.Core.Expenses
             return new TransactionPeriod { Value = value };
         }
 
+        public string GetMonthName()
+        {
+            return Value.Split(',')[0];
+        }
+
         protected override IEnumerable<object> GetEqualityComponents()
         {
             yield return Value;

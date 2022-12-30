@@ -24,7 +24,7 @@ namespace Perfi.Api.Services
             Money totalIncomeAmount = await _incomeDocumentRepository.GetTotalIncomeAmountForPeriodAsync(currentTransactionPeriod);
             Money totalExpenseAmount = await _expenseRepository.GetTotalExpenseAmountForPeriodAsync(currentTransactionPeriod);
 
-            return CashFlowSummaryResponse.From(totalIncomeAmount, totalExpenseAmount);
+            return CashFlowSummaryResponse.From(currentTransactionPeriod, totalIncomeAmount, totalExpenseAmount);
         }
     }
 }
