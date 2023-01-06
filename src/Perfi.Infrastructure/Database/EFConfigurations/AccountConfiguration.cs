@@ -31,6 +31,12 @@ namespace Perfi.Infrastructure.Database.EFConfigurations
                    .HasValue<SummaryAccount>("Summary")
                    .HasValue<TransactionalAccount>("Transactional");
 
+            builder.OwnsOne(x => x.BeginingBalance, da =>
+            {
+                da.Property(x => x.Currency).HasMaxLength(4);
+                da.Property(x => x.Value);
+            });
+
             builder.Property("Type").HasMaxLength(13);
         }
     }

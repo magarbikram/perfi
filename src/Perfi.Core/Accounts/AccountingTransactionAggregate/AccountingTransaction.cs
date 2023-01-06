@@ -1,5 +1,6 @@
 ﻿using Perfi.SharedKernel;
 using Perfi.Core.Accounts.Exceptions;
+using Perfi.Core.Expenses;
 
 namespace Perfi.Core.Accounting.AccountingTransactionAggregate
 {
@@ -7,7 +8,17 @@ namespace Perfi.Core.Accounting.AccountingTransactionAggregate
     {
         public const int DescriptionMaxLength = 255;
         public string Description { get; private set; }
-        public DateTimeOffset TransactionDate { get; private set; }
+        private DateTimeOffset _transactionDate;
+
+        public DateTimeOffset TransactionDate
+        {
+            get => _transactionDate; private set
+            {
+                _transactionDate = value;
+                TransactionPeriod = TransactionPeriod.For(_transactionDate);
+            }
+        }
+        public TransactionPeriod TransactionPeriod { get; private set; }
         public DateTimeOffset DocumentDate { get; private set; }
 
         private readonly IList<AccountingEntry> _accountingEntries = new List<AccountingEntry>();

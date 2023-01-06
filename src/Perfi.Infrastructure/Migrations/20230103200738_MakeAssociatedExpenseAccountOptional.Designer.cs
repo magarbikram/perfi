@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Perfi.Infrastructure.Database;
@@ -11,9 +12,11 @@ using Perfi.Infrastructure.Database;
 namespace Perfi.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230103200738_MakeAssociatedExpenseAccountOptional")]
+    partial class MakeAssociatedExpenseAccountOptional
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,18 +47,11 @@ namespace Perfi.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("TransactionDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("TransactionPeriod")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AccountingTransactionId");
 
                     b.HasIndex("TransactionDate");
-
-                    b.HasIndex("TransactionPeriod");
 
                     b.ToTable("AccountingEntry", (string)null);
                 });
@@ -79,16 +75,9 @@ namespace Perfi.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("TransactionDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("TransactionPeriod")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("TransactionDate");
-
-                    b.HasIndex("TransactionPeriod");
 
                     b.ToTable("AccountingTransaction", (string)null);
                 });
@@ -567,29 +556,6 @@ namespace Perfi.Infrastructure.Migrations
                         .WithMany("Components")
                         .HasForeignKey("ParentAccountNumber")
                         .HasPrincipalKey("Number");
-
-                    b.OwnsOne("Perfi.Core.Accounting.Money", "BeginingBalance", b1 =>
-                        {
-                            b1.Property<int>("AccountId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("Currency")
-                                .IsRequired()
-                                .HasMaxLength(4)
-                                .HasColumnType("character varying(4)");
-
-                            b1.Property<decimal>("Value")
-                                .HasColumnType("numeric");
-
-                            b1.HasKey("AccountId");
-
-                            b1.ToTable("Account");
-
-                            b1.WithOwner()
-                                .HasForeignKey("AccountId");
-                        });
-
-                    b.Navigation("BeginingBalance");
                 });
 
             modelBuilder.Entity("Perfi.Core.Accounts.LoanAggregate.Loan", b =>

@@ -59,5 +59,10 @@ namespace Perfi.Infrastructure.Database.Repositories
         {
             return await _appDbContext.TransactionalAccounts.CountAsync(ta => ta.ParentAccountNumber == summaryAccountNumber);
         }
+
+        public async Task<IEnumerable<TransactionalAccount>> GetByAccountNumbersAsync(IEnumerable<AccountNumber> accountNumbers)
+        {
+            return await _appDbContext.TransactionalAccounts.Where(ta => accountNumbers.Contains(ta.Number)).ToListAsync();
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
+using Perfi.Core.Accounts.AccountAggregate;
 using Perfi.Core.Accounts.CreditCardAggregate;
 using Perfi.SharedKernel;
 
@@ -18,6 +19,11 @@ namespace Perfi.Infrastructure.Database.Repositories
         public CreditCardAccount Add(CreditCardAccount creditCardAccount)
         {
             return _appDbContext.Add(creditCardAccount).Entity;
+        }
+
+        public async Task<IEnumerable<AccountNumber>> GetAllAccountNumbersAsync()
+        {
+            return await _appDbContext.CreditCardAccounts.Select(cc => cc.AssociatedAccountNumber).ToListAsync();
         }
 
         public async Task<List<CreditCardAccount>> GetAllAsync()

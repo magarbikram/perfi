@@ -1,5 +1,6 @@
 ﻿using Perfi.Api.Commands;
 using Perfi.Api.Responses;
+using Perfi.Core.Accounting;
 using Perfi.Core.Accounts.AccountAggregate;
 using Perfi.Core.Accounts.CashAccountAggregate;
 
@@ -34,6 +35,10 @@ namespace Perfi.Api.Services
             AccountNumber bankCashSummaryAccountNumber = AccountNumber.From(SummaryAccount.DefaultAccountNumbers.BankCashAccount);
             AccountNumber newCashAccountNumber = await _getNextAccountNumberService.GetNextAsync(bankCashSummaryAccountNumber);
             TransactionalAccount newBankCashAccount = TransactionalAccount.NewAssetAccount(newCashAccountNumber, name: addNewCashAccountCommand.Name, parentAccountNumber: bankCashSummaryAccountNumber);
+            if (addNewCashAccountCommand.CurrentBalance.HasValue && addNewCashAccountCommand.CurrentBalance > 0)
+            {
+                newBankCashAccount.SetBeginingBalance(Money.UsdFrom(addNewCashAccountCommand.CurrentBalance.Value));
+            }
             newBankCashAccount = _transactionalAccountRepository.Add(newBankCashAccount);
             return newBankCashAccount;
         }

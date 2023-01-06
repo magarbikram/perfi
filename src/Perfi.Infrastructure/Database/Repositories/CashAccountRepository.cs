@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
+using Perfi.Core.Accounts.AccountAggregate;
 using Perfi.Core.Accounts.CashAccountAggregate;
 using Perfi.SharedKernel;
 
@@ -18,6 +19,11 @@ namespace Perfi.Infrastructure.Database.Repositories
         public CashAccount Add(CashAccount cashAccount)
         {
             return _appDbContext.Add(cashAccount).Entity;
+        }
+
+        public async Task<IEnumerable<AccountNumber>> GetAllAccountNumbersAsync()
+        {
+            return await _appDbContext.CashAccounts.Select(ca => ca.AssociatedAccountNumber).ToListAsync();
         }
 
         public async Task<List<CashAccount>> GetAllAsync()

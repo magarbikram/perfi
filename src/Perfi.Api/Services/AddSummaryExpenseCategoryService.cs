@@ -23,6 +23,7 @@ namespace Perfi.Api.Services
         {
             TransactionalAccount associatedExpenseAccount = await GetExpenseAccountAsync(addNewSummaryExpenseCategoryCommand.ExpenseAccountNumber);
             SummaryExpenseCategory summaryExpenseCategory = SummaryExpenseCategory.From(code: addNewSummaryExpenseCategoryCommand.Code, name: addNewSummaryExpenseCategoryCommand.Name, associatedExpenseAccount);
+
             _summaryExpenseCategoryRepository.Add(summaryExpenseCategory);
             await _summaryExpenseCategoryRepository.UnitOfWork.SaveChangesAsync();
             return NewSummaryExpenseCategoryAddedResponse.From(summaryExpenseCategory);

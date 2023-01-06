@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using System.Net.Http.Headers;
 
 namespace Perfi.Core.Expenses
 {
@@ -8,6 +9,8 @@ namespace Perfi.Core.Expenses
         public const int MaxLength = 50;
 
         public string Value { get; private set; }
+        public static ExpenseCategoryCode MortgagePayment => From("Mortgage");
+        public static ExpenseCategoryCode DebtPayment => From("Debt");
 
         protected ExpenseCategoryCode()
         {

@@ -84,6 +84,11 @@ namespace Perfi.Core.Accounting
             return sum;
         }
 
+        public Money Negate()
+        {
+            return From(Value * -1, Currency);
+        }
+
         public static Money operator -(Money x, Money y)
         {
             GuardAgainstMultipleCurrencies(x, y);

@@ -14,6 +14,7 @@ namespace Perfi.Core.Accounts.AccountAggregate
         Task<int> CountWithSummaryAccountNumberAsync(AccountNumber jobServiceSummaryAccountNumber);
         Task<IEnumerable<TransactionalAccount>> GetAllHomeExpenseAccountsAsync();
         Task<Maybe<TransactionalAccount>> GetByAccountNumberAsync(AccountNumber accountNumber);
+        Task<IEnumerable<TransactionalAccount>> GetByAccountNumbersAsync(IEnumerable<AccountNumber> accountNumbers);
         Task<Maybe<TransactionalAccount>> GetHomeExpenseAccountByNumberAsync(string expenseAccountNumber);
     }
 }

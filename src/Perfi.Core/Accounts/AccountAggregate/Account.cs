@@ -1,4 +1,5 @@
 ﻿using Ardalis.GuardClauses;
+using Perfi.Core.Accounting;
 using Perfi.SharedKernel;
 
 namespace Perfi.Core.Accounts.AccountAggregate
@@ -28,5 +29,7 @@ namespace Perfi.Core.Accounts.AccountAggregate
         public string Name { get; private set; }
 
         public AccountNumber ParentAccountNumber { get; protected set; }
+
+        public Money? BeginingBalance { get; protected set; }
     }
 }

@@ -27,7 +27,7 @@ namespace Perfi.Infrastructure.Database.EFConfigurations
             builder.Property(x => x.AssociatedExpenseAccountNumber)
                    .HasConversion(accountNumber => accountNumber.Value, value => AccountNumber.From(value))
                    .HasMaxLength(AccountNumber.MaxLength)
-                   .IsRequired(true);
+                   .IsRequired(false);
         }
     }
 }

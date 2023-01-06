@@ -31,9 +31,9 @@ namespace Perfi.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ListCreditCardAccountResponse>>> AllAsync()
+        public async Task<ActionResult<List<ListCreditCardAccountResponse>>> AllAsync(bool withCurrentBalance)
         {
-            List<ListCreditCardAccountResponse> listCreditCardAccountResponses = await _creditCardAccountQueryService.GetAllAsync();
+            List<ListCreditCardAccountResponse> listCreditCardAccountResponses = await _creditCardAccountQueryService.GetAllAsync(withCurrentBalance);
             return Ok(listCreditCardAccountResponses);
         }
     }

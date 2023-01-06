@@ -4,6 +4,6 @@ namespace Perfi.Api.Services
 {
     public interface ICreditCardAccountQueryService
     {
-        Task<List<ListCreditCardAccountResponse>> GetAllAsync();
+        Task<List<ListCreditCardAccountResponse>> GetAllAsync(bool withCurrentBalance);
     }
 }

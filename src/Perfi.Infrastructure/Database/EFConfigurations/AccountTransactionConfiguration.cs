@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Perfi.Core.Accounting.AccountingTransactionAggregate;
+using Perfi.Core.Expenses;
 
 namespace Perfi.Infrastructure.Database.EFConfigurations
 {
@@ -19,7 +20,12 @@ namespace Perfi.Infrastructure.Database.EFConfigurations
                 navigation.SetPropertyAccessMode(PropertyAccessMode.Field);
             }
 
+            builder.Property(x => x.TransactionPeriod)
+                   .HasConversion(transactionPeriod => transactionPeriod.Value, value => TransactionPeriod.From(value))
+                   .HasMaxLength(TransactionPeriod.MaxLength)
+                   .IsRequired();
 
+            builder.HasIndex(x => x.TransactionPeriod).IsUnique(false);
             builder.HasIndex(x => x.TransactionDate).IsUnique(false);
         }
     }

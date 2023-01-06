@@ -71,6 +71,12 @@ builder.Services.AddScoped<IAddNewIncomeService, AddNewIncomeService>();
 builder.Services.AddScoped<IIncomeDocumentQueryService, IncomeDocumentQueryService>();
 builder.Services.AddScoped<ICashFlowReportService, CashFlowReportService>();
 
+builder.Services.AddScoped<IPayMortgageService, PayMortgageService>();
+builder.Services.AddScoped<IPayCreditCardService, PayCreditCardService>();
+builder.Services.AddScoped<IPayLoanService, PayLoanService>();
+builder.Services.AddScoped<ICalculateCurrentBalanceService, CalculateCurrentBalanceService>();
+builder.Services.AddScoped<IBuildSummaryAccountResponseService, BuildSummaryAccountResponseService>();
+
 var app = builder.Build();
 app.UseCors();
 // Configure the HTTP request pipeline.

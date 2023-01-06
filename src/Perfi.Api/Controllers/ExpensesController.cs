@@ -12,19 +12,50 @@ namespace Perfi.Api.Controllers
     {
         private readonly IAddNewExpenseService _addNewExpenseService;
         private readonly IExpenseQueryService _expenseQueryService;
+        private readonly IPayMortgageService _payMortgageService;
+        private readonly IPayCreditCardService _payCreditCardService;
+        private readonly IPayLoanService _payLoanService;
 
         public ExpensesController(
             IAddNewExpenseService addNewExpenseService,
-            IExpenseQueryService expenseQueryService)
+            IExpenseQueryService expenseQueryService,
+            IPayMortgageService payMortgageService,
+            IPayCreditCardService payCreditCardService,
+            IPayLoanService payLoanService)
         {
             _addNewExpenseService = addNewExpenseService;
             _expenseQueryService = expenseQueryService;
+            _payMortgageService = payMortgageService;
+            _payCreditCardService = payCreditCardService;
+            _payLoanService = payLoanService;
         }
 
         [HttpPost]
         public async Task<ActionResult<NewExpenseAddedResponse>> AddAsync([FromBody] AddNewExpenseCommand addNewExpenseAccountCommand)
         {
             NewExpenseAddedResponse newExpenseAddedResponse = await _addNewExpenseService.AddAsync(addNewExpenseAccountCommand);
+            return Created("", newExpenseAddedResponse);
+        }
+
+
+        [HttpPost("PayMortgage")]
+        public async Task<ActionResult<NewExpenseAddedResponse>> PayMortgageAsync([FromBody] PayMortgageCommand payMortgageCommand)
+        {
+            NewExpenseAddedResponse newExpenseAddedResponse = await _payMortgageService.PayAsync(payMortgageCommand);
+            return Created("", newExpenseAddedResponse);
+        }
+
+        [HttpPost("PayLoan")]
+        public async Task<ActionResult<NewExpenseAddedResponse>> PayLoanAsync([FromBody] PayLoanCommand payMortgageCommand)
+        {
+            NewExpenseAddedResponse newExpenseAddedResponse = await _payLoanService.PayAsync(payMortgageCommand);
+            return Created("", newExpenseAddedResponse);
+        }
+
+        [HttpPost("PayCreditCard")]
+        public async Task<ActionResult<NewExpenseAddedResponse>> PayCreditCardAsync([FromBody] PayCreditCardCommand payCreditCardCommand)
+        {
+            NewExpenseAddedResponse newExpenseAddedResponse = await _payCreditCardService.PayAsync(payCreditCardCommand);
             return Created("", newExpenseAddedResponse);
         }
 

@@ -1,4 +1,5 @@
 ﻿using Ardalis.GuardClauses;
+using Perfi.Core.Accounting;
 
 namespace Perfi.Core.Accounts.AccountAggregate
 {
@@ -47,6 +48,34 @@ namespace Perfi.Core.Accounts.AccountAggregate
             {
                 ParentAccountNumber = parentAccountNumber
             };
+        }
+
+        public void SetBeginingBalance(Money beginingBalanceAmount)
+        {
+            Guard.Against.Null(beginingBalanceAmount);
+            BeginingBalance = beginingBalanceAmount;
+        }
+
+        public static class DefaultAccountNumbers
+        {
+            public const string InterestPaid = "500-01-01";
+            public const string EscrowPaid = "500-01-02";
+            public const string FeePaid = "500-01-03";
+
+            public static AccountNumber GetInterestPaid()
+            {
+                return AccountNumber.From(InterestPaid);
+            }
+
+            public static AccountNumber GetEscrowPaid()
+            {
+                return AccountNumber.From(EscrowPaid);
+            }
+
+            public static AccountNumber GetFeePaid()
+            {
+                return AccountNumber.From(FeePaid);
+            }
         }
     }
 }

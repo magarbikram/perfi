@@ -12,5 +12,7 @@ namespace Perfi.Api.Commands
         [Required]
         [MaxLength(CashAccount.MaxLengths.BankName)]
         public string BankName { get; set; }
+
+        public decimal? CurrentBalance { get; set; }
     }
 }

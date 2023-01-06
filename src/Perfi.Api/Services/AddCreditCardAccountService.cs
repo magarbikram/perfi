@@ -2,6 +2,7 @@
 using Perfi.Api.Commands;
 using Perfi.Api.Exceptions;
 using Perfi.Api.Responses;
+using Perfi.Core.Accounting;
 using Perfi.Core.Accounts.AccountAggregate;
 using Perfi.Core.Accounts.CreditCardAggregate;
 
@@ -36,6 +37,10 @@ namespace Perfi.Api.Services
             AccountNumber creditCardSummaryAccountNumber = AccountNumber.From(SummaryAccount.DefaultAccountNumbers.CreditCardAccount);
             AccountNumber newCreditCardAccountNumber = await _getNextAccountNumberService.GetNextAsync(creditCardSummaryAccountNumber);
             TransactionalAccount newCreditCardAccount = TransactionalAccount.NewLiabilityAccount(newCreditCardAccountNumber, name: addNewCreditCardAccountCommand.Name, parentAccountNumber: creditCardSummaryAccountNumber);
+            if (addNewCreditCardAccountCommand.CurrentBalance.HasValue)
+            {
+                newCreditCardAccount.SetBeginingBalance(Money.UsdFrom(addNewCreditCardAccountCommand.CurrentBalance.Value).Negate());
+            }
             newCreditCardAccount = _transactionalAccountRepository.Add(newCreditCardAccount);
             return newCreditCardAccount;
         }

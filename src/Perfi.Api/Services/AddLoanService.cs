@@ -35,6 +35,7 @@ namespace Perfi.Api.Services
             AccountNumber bankCashSummaryAccountNumber = AccountNumber.From(SummaryAccount.DefaultAccountNumbers.LoanAccount);
             AccountNumber newLoanAccountNumber = await _getNextAccountNumberService.GetNextAsync(bankCashSummaryAccountNumber);
             TransactionalAccount newBankLoan = TransactionalAccount.NewLiabilityAccount(newLoanAccountNumber, name: addNewLoanCommand.Name, parentAccountNumber: bankCashSummaryAccountNumber);
+            newBankLoan.SetBeginingBalance(Money.UsdFrom(addNewLoanCommand.LoanAmount).Negate());
             newBankLoan = _transactionalAccountRepository.Add(newBankLoan);
             return newBankLoan;
         }

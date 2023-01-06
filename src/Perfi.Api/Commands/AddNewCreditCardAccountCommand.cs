@@ -16,5 +16,10 @@ namespace Perfi.Api.Commands
         [Required]
         [MaxLength(CreditCardAccount.MaxLengths.LastFourDigits)]
         public string LastFourDigits { get; set; }
+
+        /// <summary>
+        /// Provide negative value for credit balance
+        /// </summary>
+        public decimal? CurrentBalance { get; set; }
     }
 }

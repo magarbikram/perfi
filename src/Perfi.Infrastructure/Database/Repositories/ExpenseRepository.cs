@@ -47,5 +47,10 @@ namespace Perfi.Infrastructure.Database.Repositories
                                                         .SumAsync(exa => exa.Value);
             return Money.UsdFrom(totalExpenseAmountValue);
         }
+
+        public void Update(Expense expense)
+        {
+            _appDbContext.Expenses.Update(expense);
+        }
     }
 }

@@ -4,6 +4,6 @@ namespace Perfi.Api.Services
 {
     public interface ILoanQueryService
     {
-        Task<List<ListLoanResponse>> GetAllAsync();
+        Task<List<ListLoanResponse>> GetAllAsync(bool withCurrentBalance);
     }
 }

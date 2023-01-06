@@ -27,9 +27,9 @@ namespace Perfi.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ListLoanResponse>>> AllAsync()
+        public async Task<ActionResult<List<ListLoanResponse>>> AllAsync(bool withCurrentBalance)
         {
-            List<ListLoanResponse> listLoanResponses = await _cashAccountQueryService.GetAllAsync();
+            List<ListLoanResponse> listLoanResponses = await _cashAccountQueryService.GetAllAsync(withCurrentBalance);
             return Ok(listLoanResponses);
         }
     }
