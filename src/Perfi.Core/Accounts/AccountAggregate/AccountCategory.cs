@@ -8,6 +8,6 @@ namespace Perfi.Core.Accounts.AccountAggregate
 {
     public enum AccountCategory
     {
-        Assets, Liabilities, Expenses, Revenues
+        Assets = 0, Liabilities = 1, Expenses = 2, Revenues = 3, Equity = 5
     }
 }

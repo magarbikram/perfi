@@ -9,7 +9,9 @@ namespace Perfi.Core.Expenses
         public const int MaxLength = 50;
 
         public string Value { get; private set; }
+        public static ExpenseCategoryCode Housing => From("Housing");
         public static ExpenseCategoryCode MortgagePayment => From("Mortgage");
+        public static ExpenseCategoryCode Debts => From("Debts");
         public static ExpenseCategoryCode DebtPayment => From("Debt");
 
         protected ExpenseCategoryCode()
