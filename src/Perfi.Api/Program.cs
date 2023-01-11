@@ -9,6 +9,7 @@ using Perfi.Core.Accounts.LoanAggregate;
 using Perfi.Core.Earnings;
 using Perfi.Core.Earnings.IncomeSources;
 using Perfi.Core.Expenses;
+using Perfi.Core.SplitPartners;
 using Perfi.Infrastructure.Database;
 using Perfi.Infrastructure.Database.Repositories;
 using System.Text.Json.Serialization;
@@ -49,6 +50,7 @@ builder.Services.AddScoped<IAccountingTransactionRepository, AccountingTransacti
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<IIncomeSourceRepository, IncomeSourceRepository>();
 builder.Services.AddScoped<IIncomeDocumentRepository, IncomeDocumentRepository>();
+builder.Services.AddScoped<ISplitPartnerRepository, SplitPartnerRepository>();
 
 //services
 builder.Services.AddScoped<IAddCashAccountService, AddCashAccountService>();
@@ -76,11 +78,13 @@ builder.Services.AddScoped<IPayCreditCardService, PayCreditCardService>();
 builder.Services.AddScoped<IPayLoanService, PayLoanService>();
 builder.Services.AddScoped<ICalculateCurrentBalanceService, CalculateCurrentBalanceService>();
 builder.Services.AddScoped<IBuildSummaryAccountResponseService, BuildSummaryAccountResponseService>();
+builder.Services.AddScoped<IAddSplitPartnerService, AddSplitPartnerService>();
+builder.Services.AddScoped<ISplitPartnerQueryService, SplitPartnerQueryService>();
 
 var app = builder.Build();
 app.UseCors();
 // Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();

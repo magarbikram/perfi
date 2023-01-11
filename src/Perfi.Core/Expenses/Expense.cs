@@ -3,12 +3,8 @@ using Perfi.Core.Accounting;
 using Perfi.Core.Accounting.AccountingTransactionAggregate;
 using Perfi.Core.Accounts.CashAccountAggregate;
 using Perfi.Core.Accounts.CreditCardAggregate;
+using Perfi.Core.SplitPartners;
 using Perfi.SharedKernel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Perfi.Core.Expenses
 {
@@ -31,6 +27,7 @@ namespace Perfi.Core.Expenses
         public ExpenseCategoryCode ExpenseCategoryCode { get; private set; }
         public Money Amount { get; private set; }
         public ExpensePaymentMethod PaymentMethod { get; private set; }
+        public SplitPayment? SplitPayment { get; private set; }
         public int? AccountingTransactionId { get; private set; }
 
         protected Expense()
@@ -74,6 +71,67 @@ namespace Perfi.Core.Expenses
         {
             Guard.Against.Null(accountingTransaction, nameof(accountingTransaction));
             AccountingTransactionId = accountingTransaction.Id;
+        }
+
+        public static Expense NewSplitExpensePaidBySplitPartner(
+            string description, DateTimeOffset transactionDate,
+            ExpenseCategoryCode expenseCategoryCode, Money ownerShareExpenseAmount,
+            SplitPartner splitPartner, Money splitPartnerShareExpenseAmount)
+        {
+            Expense expense = new()
+            {
+                Description = description,
+                TransactionDate = transactionDate.UtcDateTime,
+                DocumentDate = DateTimeOffset.UtcNow,
+                ExpenseCategoryCode = expenseCategoryCode,
+                Amount = ownerShareExpenseAmount,
+                SplitPayment = SplitPayment.From(splitPartner, ownerShareExpenseAmount, splitPartnerShareExpenseAmount),
+                PaymentMethod = SplitPartnerExpensePaymentMethod.From(splitPartner)
+            };
+            return expense;
+        }
+
+        public static Expense NewSplitExpenseWithCreditCardPayment(
+            string description, DateTimeOffset transactionDate, ExpenseCategoryCode expenseCategoryCode, Money ownerShareExpenseAmount,
+            CreditCardAccount creditCardAccount,
+            SplitPartner splitPartner,
+            Money splitPartnerShareExpenseAmount)
+        {
+            Expense expense = new()
+            {
+                Description = description,
+                TransactionDate = transactionDate.UtcDateTime,
+                DocumentDate = DateTimeOffset.UtcNow,
+                ExpenseCategoryCode = expenseCategoryCode,
+                Amount = ownerShareExpenseAmount,
+                SplitPayment = SplitPayment.From(splitPartner, ownerShareExpenseAmount, splitPartnerShareExpenseAmount),
+                PaymentMethod = CreditCardExpensePaymentMethod.From(creditCardAccount)
+            };
+            return expense;
+        }
+
+        public static Expense NewSplitExpenseWithCashAccountPayment(string description, DateTimeOffset transactionDate, ExpenseCategoryCode expenseCategoryCode,
+            Money ownerShareExpenseAmount,
+            CashAccount cashAccount,
+            SplitPartner splitPartner,
+            Money splitPartnerShareExpenseAmount)
+        {
+            Expense expense = new()
+            {
+                Description = description,
+                TransactionDate = transactionDate.UtcDateTime,
+                DocumentDate = DateTimeOffset.UtcNow,
+                ExpenseCategoryCode = expenseCategoryCode,
+                Amount = ownerShareExpenseAmount,
+                SplitPayment = SplitPayment.From(splitPartner, ownerShareExpenseAmount, splitPartnerShareExpenseAmount),
+                PaymentMethod = CashAccountExpensePaymentMethod.From(cashAccount)
+            };
+            return expense;
+        }
+
+        public bool IsSplit()
+        {
+            return SplitPayment != null;
         }
     }
 }

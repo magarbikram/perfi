@@ -9,6 +9,7 @@ using Perfi.Core.Accounts.AccountingTransactionAggregate;
 using Perfi.Core.Accounts.CashAccountAggregate;
 using Perfi.Core.Accounts.CreditCardAggregate;
 using Perfi.Core.Expenses;
+using Perfi.Core.SplitPartners;
 
 namespace Perfi.Api.Services
 {
@@ -21,6 +22,7 @@ namespace Perfi.Api.Services
         private readonly ILogger<AddNewExpenseService> _logger;
         private readonly ITransactionalAccountRepository _transactionalAccountRepository;
         private readonly ITransactionalExpenseCategoryRepository _transactionalExpenseCategoryRepository;
+        private readonly ISplitPartnerRepository _splitPartnerRepository;
 
         public AddNewExpenseService(
             IExpenseRepository expenseRepository,
@@ -29,7 +31,8 @@ namespace Perfi.Api.Services
             ICashAccountRepository cashAccountRepository,
             ILogger<AddNewExpenseService> logger,
             ITransactionalAccountRepository transactionalAccountRepository,
-            ITransactionalExpenseCategoryRepository transactionalExpenseCategoryRepository)
+            ITransactionalExpenseCategoryRepository transactionalExpenseCategoryRepository,
+            ISplitPartnerRepository splitPartnerRepository)
         {
             _expenseRepository = expenseRepository;
             _accountingTransactionRepository = accountingTransactionRepository;
@@ -38,6 +41,7 @@ namespace Perfi.Api.Services
             _logger = logger;
             _transactionalAccountRepository = transactionalAccountRepository;
             _transactionalExpenseCategoryRepository = transactionalExpenseCategoryRepository;
+            _splitPartnerRepository = splitPartnerRepository;
         }
         public async Task<NewExpenseAddedResponse> AddAsync(AddNewExpenseCommand addNewExpenseCommand)
         {
@@ -56,15 +60,127 @@ namespace Perfi.Api.Services
 
         private async Task<Expense> AddNewExpenseAsync(AddNewExpenseCommand addNewExpenseCommand)
         {
+            Expense newExpense = await BuildNewExpenseWith(addNewExpenseCommand);
+            newExpense = _expenseRepository.Add(newExpense);
+            return newExpense;
+        }
+
+        private Task<Expense> BuildNewExpenseWith(AddNewExpenseCommand addNewExpenseCommand)
+        {
+            if (addNewExpenseCommand.IsSplitExpense())
+            {
+                return BuildNewSplitExpense(addNewExpenseCommand);
+            }
+            else
+            {
+                return BuildNewExpenseWithNoSplit(addNewExpenseCommand);
+            }
+        }
+
+        private Task<Expense> BuildNewSplitExpense(AddNewExpenseCommand addNewExpenseCommand)
+        {
+            if (addNewExpenseCommand.SplitPayment.IsPaidBySplitPartner)
+            {
+                return BuildNewSplitExpensePaidBySplitPartner(addNewExpenseCommand);
+            }
+            else
+            {
+                return BuildNewExpenseWithSplitAndPaidByAccountHolder(addNewExpenseCommand);
+            }
+        }
+
+        private async Task<Expense> BuildNewExpenseWithSplitAndPaidByAccountHolder(AddNewExpenseCommand addNewExpenseCommand)
+        {
             if (addNewExpenseCommand.PaymentMethod.PaymentMethodType == PaymentMethodType.CreditCard)
             {
-                return await AddCreditCardExpenseAsync(addNewExpenseCommand);
+                return await BuildNewSplitExpenseWithCreditCardPaymentAsync(addNewExpenseCommand);
             }
-            return await AddCashAccountExpenseAsync(addNewExpenseCommand);
+            else
+            {
+                return await BuildNewSplitExpenseWithCashAccountPaymentAsync(addNewExpenseCommand);
+            }
 
         }
 
-        private async Task<Expense> AddCreditCardExpenseAsync(AddNewExpenseCommand addNewExpenseCommand)
+        private async Task<Expense> BuildNewSplitExpenseWithCashAccountPaymentAsync(AddNewExpenseCommand addNewExpenseCommand)
+        {
+            Money ownerShareExpenseAmount = Money.UsdFrom(addNewExpenseCommand.SplitPayment.PaymentShare.OwnerShare);
+            if (ownerShareExpenseAmount.IsZero())
+            {
+                throw new ArgumentException($"Account holder expense amount should not be zero");
+            }
+            Money splitPartnerShareExpenseAmount = Money.UsdFrom(addNewExpenseCommand.SplitPayment.PaymentShare.OwnerShare);
+            CashAccount cashAccount = await FindCashAccountByIdAsync(addNewExpenseCommand.PaymentMethod.CashAccountId!.Value);
+            SplitPartner splitPartner = await FindSplitPartnerByIdAsync(addNewExpenseCommand.SplitPayment.SplitPartnerId);
+            Expense newExpense = Expense.NewSplitExpenseWithCashAccountPayment(description: addNewExpenseCommand.Description,
+                                             transactionDate: DateTimeOffset.FromUnixTimeMilliseconds(addNewExpenseCommand.TransactionDateUnixTimeStamp),
+                                             expenseCategoryCode: ExpenseCategoryCode.From(addNewExpenseCommand.ExpenseCategoryCode),
+                                             ownerShareExpenseAmount: Money.UsdFrom(addNewExpenseCommand.Amount),
+                                             cashAccount,
+                                             splitPartner,
+                                             splitPartnerShareExpenseAmount
+                                             );
+            return newExpense;
+        }
+
+        private async Task<Expense> BuildNewSplitExpenseWithCreditCardPaymentAsync(AddNewExpenseCommand addNewExpenseCommand)
+        {
+            Money ownerShareExpenseAmount = Money.UsdFrom(addNewExpenseCommand.SplitPayment.PaymentShare.OwnerShare);
+            if (ownerShareExpenseAmount.IsZero())
+            {
+                throw new ArgumentException($"Account holder expense amount should not be zero");
+            }
+            Money splitPartnerShareExpenseAmount = Money.UsdFrom(addNewExpenseCommand.SplitPayment.PaymentShare.OwnerShare);
+            CreditCardAccount creditCardAccount = await FindCreditCardAccountAsync(addNewExpenseCommand.PaymentMethod.CreditCardAccountId!.Value);
+            SplitPartner splitPartner = await FindSplitPartnerByIdAsync(addNewExpenseCommand.SplitPayment.SplitPartnerId);
+            Expense newExpense = Expense.NewSplitExpenseWithCreditCardPayment(description: addNewExpenseCommand.Description,
+                                             transactionDate: DateTimeOffset.FromUnixTimeMilliseconds(addNewExpenseCommand.TransactionDateUnixTimeStamp),
+                                             expenseCategoryCode: ExpenseCategoryCode.From(addNewExpenseCommand.ExpenseCategoryCode),
+                                             ownerShareExpenseAmount: ownerShareExpenseAmount,
+                                             creditCardAccount,
+                                             splitPartner,
+                                             splitPartnerShareExpenseAmount
+                                             );
+            return newExpense;
+        }
+
+        private async Task<Expense> BuildNewSplitExpensePaidBySplitPartner(AddNewExpenseCommand addNewExpenseCommand)
+        {
+            Money ownerShareExpenseAmount = Money.UsdFrom(addNewExpenseCommand.SplitPayment.PaymentShare.OwnerShare);
+            if (ownerShareExpenseAmount.IsZero())
+            {
+                throw new ArgumentException($"Account holder expense amount should not be zero");
+            }
+            Money splitPartnerShareExpenseAmount = Money.UsdFrom(addNewExpenseCommand.SplitPayment.PaymentShare.OwnerShare);
+            SplitPartner splitPartner = await FindSplitPartnerByIdAsync(addNewExpenseCommand.SplitPayment.SplitPartnerId);
+            return Expense.NewSplitExpensePaidBySplitPartner(description: addNewExpenseCommand.Description,
+                                             transactionDate: DateTimeOffset.FromUnixTimeMilliseconds(addNewExpenseCommand.TransactionDateUnixTimeStamp),
+                                             expenseCategoryCode: ExpenseCategoryCode.From(addNewExpenseCommand.ExpenseCategoryCode),
+                                             ownerShareExpenseAmount: ownerShareExpenseAmount,
+                                             splitPartner,
+                                             splitPartnerShareExpenseAmount);
+        }
+
+        private Task<Expense> BuildNewExpenseWithNoSplit(AddNewExpenseCommand addNewExpenseCommand)
+        {
+            if (addNewExpenseCommand.PaymentMethod.PaymentMethodType == PaymentMethodType.CreditCard)
+            {
+                return BuildExpenseWithCreditCardPaymentAsync(addNewExpenseCommand);
+            }
+            return BuildExpenseWithCashAccountPaymentAsync(addNewExpenseCommand);
+        }
+
+        private async Task<SplitPartner> FindSplitPartnerByIdAsync(int splitPartnerId)
+        {
+            Maybe<SplitPartner> splitPartner = await _splitPartnerRepository.GetByIdAsync(splitPartnerId);
+            if (splitPartner.HasNoValue)
+            {
+                throw new ResourceNotFoundException($"Split partner with id '{splitPartnerId}' not found");
+            }
+            return splitPartner.Value;
+        }
+
+        private async Task<Expense> BuildExpenseWithCreditCardPaymentAsync(AddNewExpenseCommand addNewExpenseCommand)
         {
             CreditCardAccount creditCardAccount = await FindCreditCardAccountAsync(addNewExpenseCommand.PaymentMethod.CreditCardAccountId!.Value);
             Expense newExpense = Expense.NewCreditCardExpense(description: addNewExpenseCommand.Description,
@@ -73,14 +189,10 @@ namespace Perfi.Api.Services
                                              amount: Money.UsdFrom(addNewExpenseCommand.Amount),
                                              creditCardAccount
                                              );
-            newExpense = _expenseRepository.Add(newExpense);
-            await _expenseRepository.UnitOfWork.SaveChangesAsync();
-
-            _logger.LogInformation("New expense {Id} added", newExpense.Id);
             return newExpense;
         }
 
-        private async Task<Expense> AddCashAccountExpenseAsync(AddNewExpenseCommand addNewExpenseCommand)
+        private async Task<Expense> BuildExpenseWithCashAccountPaymentAsync(AddNewExpenseCommand addNewExpenseCommand)
         {
             CashAccount cashAccount = await FindCashAccountByIdAsync(addNewExpenseCommand.PaymentMethod.CashAccountId!.Value);
             Expense newExpense = Expense.NewCashAccountExpense(description: addNewExpenseCommand.Description,
@@ -89,10 +201,6 @@ namespace Perfi.Api.Services
                                              amount: Money.UsdFrom(addNewExpenseCommand.Amount),
                                              cashAccount
                                              );
-            newExpense = _expenseRepository.Add(newExpense);
-            await _expenseRepository.UnitOfWork.SaveChangesAsync();
-
-            _logger.LogInformation($"New expense [{newExpense.Id}] added");
             return newExpense;
         }
 
@@ -128,6 +236,39 @@ namespace Perfi.Api.Services
 
         private async Task<AccountingTransaction> BuildAccountingTransactionForExpenseAsync(Expense expense)
         {
+            if (expense.IsSplit())
+            {
+                return await BuildAccountingTransationWithSplitAsync(expense);
+            }
+            else
+            {
+                return await BuildAccountingTransationWithNoSplitAsync(expense);
+            }
+        }
+
+        private async Task<AccountingTransaction> BuildAccountingTransationWithSplitAsync(Expense expense)
+        {
+            AccountingEntry creditAccountingEntry = await BuildCreditAccountingEntryForSplitExpense(expense);
+            AccountingEntry debitAccountingEntry = await BuildDebitAccountingEntry(expense);
+            if (!expense.SplitPayment!.SplitPartnerShare.IsZero())
+            {
+                AccountingEntry splitPartnerDebitAccountingEntry = await BuildSplitPartnerDebitAccountingEntry(expense);
+                return AccountingTransaction.New(expense.TransactionDate, expense.Description,
+                                             creditAccountingEntry, debitAccountingEntry, splitPartnerDebitAccountingEntry);
+            }
+            return AccountingTransaction.New(expense.TransactionDate, expense.Description,
+                                             creditAccountingEntry, debitAccountingEntry);
+        }
+
+        private async Task<AccountingEntry> BuildSplitPartnerDebitAccountingEntry(Expense expense)
+        {
+            TransactionalAccount accountsPayable = await FindAccountByNumberAsync(expense.SplitPayment!.SplitPartnerReceivableAccountNumber);
+            AccountingEntry debitAccountingEntry = AccountingEntry.Debit(accountsPayable, expense.SplitPayment.SplitPartnerShare, expense.TransactionDate);
+            return debitAccountingEntry;
+        }
+
+        private async Task<AccountingTransaction> BuildAccountingTransationWithNoSplitAsync(Expense expense)
+        {
             AccountingEntry creditAccountingEntry = await BuildCreditAccountingEntry(expense);
             AccountingEntry debitAccountingEntry = await BuildDebitAccountingEntry(expense);
             return AccountingTransaction.New(expense.TransactionDate, expense.Description,
@@ -145,6 +286,12 @@ namespace Perfi.Api.Services
         {
             TransactionalAccount paymentAccount = await FindAccountByNumberAsync(expense.PaymentMethod.GetAssociatedAccountNumber());
             AccountingEntry creditAccountingEntry = AccountingEntry.Credit(paymentAccount, expense.Amount, expense.TransactionDate);
+            return creditAccountingEntry;
+        }
+        private async Task<AccountingEntry> BuildCreditAccountingEntryForSplitExpense(Expense expense)
+        {
+            TransactionalAccount paymentAccount = await FindAccountByNumberAsync(expense.PaymentMethod.GetAssociatedAccountNumber());
+            AccountingEntry creditAccountingEntry = AccountingEntry.Credit(paymentAccount, expense.SplitPayment.GetTotalAmount(), expense.TransactionDate);
             return creditAccountingEntry;
         }
 

@@ -32,6 +32,20 @@ namespace Perfi.Infrastructure.Database.EFConfigurations
                    .IsRequired();
 
             builder.HasOne(x => x.PaymentMethod).WithOne().HasForeignKey<ExpensePaymentMethod>();
+            builder.OwnsOne(x => x.SplitPayment, sp =>
+            {
+                sp.OwnsOne(x => x.SplitPartnerShare, sps =>
+                {
+                    sps.Property(x => x.Currency).HasMaxLength(4);
+                });
+                sp.OwnsOne(x => x.OwnerShare, sps =>
+                {
+                    sps.Property(x => x.Currency).HasMaxLength(4);
+                });
+                sp.Property(x => x.SplitPartnerReceivableAccountNumber)
+                  .HasConversion(accountNumber => accountNumber.Value, value => AccountNumber.From(value))
+                  .HasMaxLength(AccountNumber.MaxLength);
+            });
 
             builder.HasIndex(x => x.TransactionPeriod).IsUnique(false);
             builder.HasIndex(x => x.TransactionDate).IsUnique(false);

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Perfi.Infrastructure.Database;
@@ -11,9 +12,11 @@ using Perfi.Infrastructure.Database;
 namespace Perfi.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230111151810_AddSplitPaymentInExpense")]
+    partial class AddSplitPaymentInExpense
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -531,26 +534,6 @@ namespace Perfi.Infrastructure.Migrations
                     b.ToTable("CreditCardExpensePaymentMethod", (string)null);
                 });
 
-            modelBuilder.Entity("Perfi.Core.Expenses.SplitPartnerExpensePaymentMethod", b =>
-                {
-                    b.HasBaseType("Perfi.Core.Expenses.ExpensePaymentMethod");
-
-                    b.Property<string>("ReceivableAccountNumber")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<int>("SplitPartnerId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("SplitPartnerName")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
-
-                    b.ToTable("SplitPartnerExpensePaymentMethod", (string)null);
-                });
-
             modelBuilder.Entity("Perfi.Core.Accounting.AccountingTransactionAggregate.AccountingEntry", b =>
                 {
                     b.HasOne("Perfi.Core.Accounting.AccountingTransactionAggregate.AccountingTransaction", null)
@@ -862,15 +845,6 @@ namespace Perfi.Infrastructure.Migrations
                     b.HasOne("Perfi.Core.Expenses.ExpensePaymentMethod", null)
                         .WithOne()
                         .HasForeignKey("Perfi.Core.Expenses.CreditCardExpensePaymentMethod", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Perfi.Core.Expenses.SplitPartnerExpensePaymentMethod", b =>
-                {
-                    b.HasOne("Perfi.Core.Expenses.ExpensePaymentMethod", null)
-                        .WithOne()
-                        .HasForeignKey("Perfi.Core.Expenses.SplitPartnerExpensePaymentMethod", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

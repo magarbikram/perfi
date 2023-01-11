@@ -6,5 +6,6 @@
         public MoneyResponse CreditCardAccountsBalance { get; set; }
         public MoneyResponse LoansBalance { get; set; }
         public MoneyResponse InvestmentsBalance { get; set; }
+        public MoneyResponse SplitPartnersBalance { get; set; }
     }
 }

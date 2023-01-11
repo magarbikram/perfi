@@ -4,6 +4,7 @@ using Perfi.Core.Accounts.AccountAggregate;
 using Perfi.Core.Accounts.CashAccountAggregate;
 using Perfi.Core.Accounts.CreditCardAggregate;
 using Perfi.Core.Accounts.LoanAggregate;
+using Perfi.Core.SplitPartners;
 
 namespace Perfi.Api.Services
 {
@@ -13,17 +14,20 @@ namespace Perfi.Api.Services
         private readonly ICalculateCurrentBalanceService _calculateCurrentBalanceService;
         private readonly ICreditCardAccountRepository _creditCardAccountRepository;
         private readonly ILoanRepository _loanRepository;
+        private readonly ISplitPartnerRepository _splitPartnerRepository;
 
         public BuildSummaryAccountResponseService(
             ICashAccountRepository cashAccountRepository,
             ICalculateCurrentBalanceService calculateCurrentBalanceService,
             ICreditCardAccountRepository creditCardAccountRepository,
-            ILoanRepository loanRepository)
+            ILoanRepository loanRepository,
+            ISplitPartnerRepository splitPartnerRepository)
         {
             _cashAccountRepository = cashAccountRepository;
             _calculateCurrentBalanceService = calculateCurrentBalanceService;
             _creditCardAccountRepository = creditCardAccountRepository;
             _loanRepository = loanRepository;
+            _splitPartnerRepository = splitPartnerRepository;
         }
         public async Task<AccountSummaryResponse> Build()
         {
@@ -31,10 +35,18 @@ namespace Perfi.Api.Services
             {
                 CashAccountsBalance = await CalculateCashAccountBalanceAsync(),
                 CreditCardAccountsBalance = await CalculateCreditCardAccountsBalanceAsync(),
-                LoansBalance = await CalculateLoanAccountsBalanceAsync()
+                LoansBalance = await CalculateLoanAccountsBalanceAsync(),
+                SplitPartnersBalance = await CalculateSplitPartnersBalanceAsync()
             };
 
             return accountSummaryResponseaccountSummaryResponse;
+        }
+
+        private async Task<MoneyResponse> CalculateSplitPartnersBalanceAsync()
+        {
+            IEnumerable<AccountNumber> loanAccountNumbers = await _splitPartnerRepository.GetAllAccountNumbersAsync();
+            Money money = await _calculateCurrentBalanceService.GetCurrentBalanceOfAccountAsync(loanAccountNumbers);
+            return MoneyResponse.From(money);
         }
 
         private async Task<MoneyResponse> CalculateLoanAccountsBalanceAsync()

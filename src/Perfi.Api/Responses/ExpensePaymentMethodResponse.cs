@@ -8,6 +8,7 @@ namespace Perfi.Api.Responses
         public PaymentMethodType PaymentMethodType { get; private set; }
         public CreditCardPaymentMethodResponse CreditCardPaymentMethod { get; private set; }
         public CashAccountPaymentMethodResponse CashAccountPaymentMethod { get; private set; }
+        public SplitPartnerPaymentMethodResponse SplitPartnerPaymentMethod { get; private set; }
 
         public static ExpensePaymentMethodResponse From(ExpensePaymentMethod paymentMethod)
         {
@@ -15,7 +16,20 @@ namespace Perfi.Api.Responses
             {
                 return FromCreditCard((CreditCardExpensePaymentMethod)paymentMethod);
             }
-            return FromCashAccount((CashAccountExpensePaymentMethod)paymentMethod);
+            else if (paymentMethod is CashAccountExpensePaymentMethod)
+            {
+                return FromCashAccount((CashAccountExpensePaymentMethod)paymentMethod);
+            }
+            return FromSplitPartner((SplitPartnerExpensePaymentMethod)paymentMethod);
+        }
+
+        private static ExpensePaymentMethodResponse FromSplitPartner(SplitPartnerExpensePaymentMethod paymentMethod)
+        {
+            return new ExpensePaymentMethodResponse
+            {
+                PaymentMethodType = PaymentMethodType.SplitPartner,
+                SplitPartnerPaymentMethod = SplitPartnerPaymentMethodResponse.From(paymentMethod)
+            };
         }
 
         private static ExpensePaymentMethodResponse FromCreditCard(CreditCardExpensePaymentMethod creditCardExpensePaymentMethod)

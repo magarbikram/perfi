@@ -55,7 +55,7 @@ namespace Perfi.Core.Accounts.AccountAggregate
             Maybe<TransactionalAccount> maybeTransactionalAccount = await _transactionalAccountRepository.GetByAccountNumberAsync(accountNumber);
             if (maybeTransactionalAccount.HasNoValue)
             {
-                throw new KeyNotFoundException($"Transaction Account with number '{accountNumber}' not found");
+                throw new KeyNotFoundException($"Transaction Account with number '{accountNumber.Value}' not found");
             }
             return maybeTransactionalAccount.Value;
         }

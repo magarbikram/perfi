@@ -2,6 +2,6 @@
 {
     public enum PaymentMethodType
     {
-        CreditCard, CashAccount
+        CreditCard, CashAccount, SplitPartner
     }
 }
