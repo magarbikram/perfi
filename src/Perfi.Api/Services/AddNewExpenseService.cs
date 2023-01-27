@@ -126,7 +126,7 @@ namespace Perfi.Api.Services
             Expense newExpense = Expense.NewSplitExpenseWithCashAccountPayment(description: addNewExpenseCommand.Description,
                                              transactionDate: DateTimeOffset.FromUnixTimeMilliseconds(addNewExpenseCommand.TransactionDateUnixTimeStamp),
                                              expenseCategoryCode: ExpenseCategoryCode.From(addNewExpenseCommand.ExpenseCategoryCode),
-                                             ownerShareExpenseAmount: Money.UsdFrom(addNewExpenseCommand.Amount),
+                                             ownerShareExpenseAmount: ownerShareExpenseAmount,
                                              cashAccount,
                                              splitPartner,
                                              splitPartnerShareExpenseAmount
