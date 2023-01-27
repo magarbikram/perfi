@@ -84,7 +84,7 @@ namespace Perfi.Core.Expenses
                 TransactionDate = transactionDate.UtcDateTime,
                 DocumentDate = DateTimeOffset.UtcNow,
                 ExpenseCategoryCode = expenseCategoryCode,
-                Amount = ownerShareExpenseAmount,
+                Amount = ownerShareExpenseAmount + splitPartnerShareExpenseAmount,
                 SplitPayment = SplitPayment.From(splitPartner, ownerShareExpenseAmount, splitPartnerShareExpenseAmount),
                 PaymentMethod = SplitPartnerExpensePaymentMethod.From(splitPartner)
             };
@@ -103,7 +103,7 @@ namespace Perfi.Core.Expenses
                 TransactionDate = transactionDate.UtcDateTime,
                 DocumentDate = DateTimeOffset.UtcNow,
                 ExpenseCategoryCode = expenseCategoryCode,
-                Amount = ownerShareExpenseAmount,
+                Amount = ownerShareExpenseAmount + splitPartnerShareExpenseAmount,
                 SplitPayment = SplitPayment.From(splitPartner, ownerShareExpenseAmount, splitPartnerShareExpenseAmount),
                 PaymentMethod = CreditCardExpensePaymentMethod.From(creditCardAccount)
             };
@@ -122,7 +122,7 @@ namespace Perfi.Core.Expenses
                 TransactionDate = transactionDate.UtcDateTime,
                 DocumentDate = DateTimeOffset.UtcNow,
                 ExpenseCategoryCode = expenseCategoryCode,
-                Amount = ownerShareExpenseAmount,
+                Amount = ownerShareExpenseAmount + splitPartnerShareExpenseAmount,
                 SplitPayment = SplitPayment.From(splitPartner, ownerShareExpenseAmount, splitPartnerShareExpenseAmount),
                 PaymentMethod = CashAccountExpensePaymentMethod.From(cashAccount)
             };

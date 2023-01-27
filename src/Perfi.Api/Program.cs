@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Perfi.Api.Responses;
+using Perfi.Api.Responses.Mappers;
 using Perfi.Api.Services;
 using Perfi.Core.Accounts.AccountAggregate;
 using Perfi.Core.Accounts.AccountingTransactionAggregate;
@@ -90,7 +91,7 @@ builder.Services.AddScoped<IAddSplitPartnerService, AddSplitPartnerService>();
 builder.Services.AddScoped<ISplitPartnerQueryService, SplitPartnerQueryService>();
 builder.Services.AddScoped<ITransferMoneyService, TransferMoneyService>();
 builder.Services.AddScoped<IMoneyTransferQueryService, MoneyTransferQueryService>();
-
+builder.Services.AddScoped<ListExpenseResponseMapper>();
 var app = builder.Build();
 app.UseCors();
 // Configure the HTTP request pipeline.

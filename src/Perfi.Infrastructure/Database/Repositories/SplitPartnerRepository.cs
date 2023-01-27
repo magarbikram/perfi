@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Perfi.Core.Accounts.AccountAggregate;
 using Perfi.Core.SplitPartners;
 using Perfi.SharedKernel;
+using System.Linq;
 
 namespace Perfi.Infrastructure.Database.Repositories
 {
@@ -35,6 +36,11 @@ namespace Perfi.Infrastructure.Database.Repositories
         public async Task<IEnumerable<AccountNumber>> GetAllAccountNumbersAsync()
         {
             return await _appDbContext.SplitPartners.Select(sp => sp.ReceivableAccountNumber).ToListAsync();
+        }
+
+        public async Task<IEnumerable<SplitPartner>> GetByIdsAsync(IEnumerable<int> splitPartnerIds)
+        {
+            return await _appDbContext.SplitPartners.Where(sp => splitPartnerIds.Contains(sp.Id)).ToListAsync();
         }
     }
 }

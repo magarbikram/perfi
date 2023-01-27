@@ -1,5 +1,7 @@
-﻿using Perfi.Api.Models;
+﻿using Perfi.Api.Commands;
+using Perfi.Api.Models;
 using Perfi.Core.Expenses;
+using Perfi.Core.SplitPartners;
 
 namespace Perfi.Api.Responses
 {
@@ -11,25 +13,32 @@ namespace Perfi.Api.Responses
         public ListTransactionalExpenseCategoryResponse ExpenseCategory { get; private set; }
         public ExpensePaymentMethodResponse ExpensePaymentMethod { get; private set; }
         public MoneyResponse Amount { get; private set; }
-        public static ListExpenseResponse From(ExpenseWithTransactionCategoryDetail expenseWithTransactionCategoryDetail)
+        public SplitPaymentResponse SplitPayment { get; private set; }
+        public static ListExpenseResponse From(ExpenseWithChildEntity expenseWithTransactionCategoryDetail)
         {
             Expense expense = expenseWithTransactionCategoryDetail.Expense;
             TransactionalExpenseCategory transactionalExpenseCategory = expenseWithTransactionCategoryDetail.TransactionalExpenseCategory;
-            return new ListExpenseResponse
+            ListExpenseResponse listExpenseResponse = new ListExpenseResponse
             {
                 Id = expense.Id,
                 Description = expense.Description,
                 TransactionDateUnixTimeStamp = expense.TransactionDate.ToUnixTimeMilliseconds(),
                 ExpenseCategory = ListTransactionalExpenseCategoryResponse.From(transactionalExpenseCategory),
                 ExpensePaymentMethod = ExpensePaymentMethodResponse.From(expense.PaymentMethod),
-                Amount = MoneyResponse.From(expense.Amount),
+                Amount = MoneyResponse.From(expense.Amount)
             };
+            if (expense.IsSplit())
+            {
+                SplitPartner splitPartner = expenseWithTransactionCategoryDetail.SplitPartner;
+                listExpenseResponse.SplitPayment = SplitPaymentResponse.From(expense.SplitPayment!, splitPartner);
+            }
+            return listExpenseResponse;
         }
 
-        internal static IEnumerable<ListExpenseResponse> From(IEnumerable<ExpenseWithTransactionCategoryDetail> expenseWithTransactionCategoryDetails)
+        internal static List<ListExpenseResponse> From(IEnumerable<ExpenseWithChildEntity> expenseWithTransactionCategoryDetails)
         {
             List<ListExpenseResponse> listExpenseResponses = new(expenseWithTransactionCategoryDetails.Count());
-            foreach (ExpenseWithTransactionCategoryDetail expenseWithTransactionCategoryDetail in expenseWithTransactionCategoryDetails)
+            foreach (ExpenseWithChildEntity expenseWithTransactionCategoryDetail in expenseWithTransactionCategoryDetails)
             {
                 listExpenseResponses.Add(From(expenseWithTransactionCategoryDetail));
             }

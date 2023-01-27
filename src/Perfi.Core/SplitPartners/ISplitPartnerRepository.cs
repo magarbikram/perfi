@@ -10,5 +10,6 @@ namespace Perfi.Core.SplitPartners
         Task<Maybe<SplitPartner>> GetByIdAsync(int id);
         Task<IEnumerable<SplitPartner>> GetAllAsync();
         Task<IEnumerable<AccountNumber>> GetAllAccountNumbersAsync();
+        Task<IEnumerable<SplitPartner>> GetByIdsAsync(IEnumerable<int> enumerable);
     }
 }

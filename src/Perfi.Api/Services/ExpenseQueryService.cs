@@ -1,6 +1,5 @@
-﻿using Perfi.Api.Models;
-using Perfi.Api.Responses;
-using Perfi.Core.Accounting;
+﻿using Perfi.Api.Responses;
+using Perfi.Api.Responses.Mappers;
 using Perfi.Core.Expenses;
 using Perfi.Core.Expenses.QueryModels;
 
@@ -9,12 +8,13 @@ namespace Perfi.Api.Services
     public class ExpenseQueryService : IExpenseQueryService
     {
         private readonly IExpenseRepository _expenseRepository;
-        private readonly ITransactionalExpenseCategoryRepository _transactionalExpenseCategoryRepository;
+        private readonly ListExpenseResponseMapper _listExpenseResponseMapper;
 
-        public ExpenseQueryService(IExpenseRepository expenseRepository, ITransactionalExpenseCategoryRepository transactionalExpenseCategoryRepository)
+        public ExpenseQueryService(IExpenseRepository expenseRepository,
+            ListExpenseResponseMapper listExpenseResponseMapper)
         {
             _expenseRepository = expenseRepository;
-            _transactionalExpenseCategoryRepository = transactionalExpenseCategoryRepository;
+            _listExpenseResponseMapper = listExpenseResponseMapper;
         }
         public async Task<IEnumerable<ListExpenseResponse>> GetCurrentExpensesAsync()
         {
@@ -25,25 +25,7 @@ namespace Perfi.Api.Services
 
         private async Task<IEnumerable<ListExpenseResponse>> MapToResponsesAsync(IEnumerable<Expense> currentExpenses)
         {
-            List<ExpenseWithTransactionCategoryDetail> expenseWithTransactionCategoryDetails = await PrepareExpenseWithTransactionCategoryDetails(currentExpenses);
-            return ListExpenseResponse.From(expenseWithTransactionCategoryDetails);
-        }
-
-        private async Task<List<ExpenseWithTransactionCategoryDetail>> PrepareExpenseWithTransactionCategoryDetails(IEnumerable<Expense> currentExpenses)
-        {
-            ISet<ExpenseCategoryCode> expenseCategoryCodes = currentExpenses.Select(exp => exp.ExpenseCategoryCode).Distinct().ToHashSet();
-            IEnumerable<TransactionalExpenseCategory> transactionalExpenseCategories = await _transactionalExpenseCategoryRepository.GetByCodesAsync(expenseCategoryCodes);
-            IDictionary<ExpenseCategoryCode, TransactionalExpenseCategory> indexedTransactionalExpenseCategories =
-                transactionalExpenseCategories.ToDictionary(tec => tec.Code);
-            List<ExpenseWithTransactionCategoryDetail> expenseWithTransactionCategoryDetails = new();
-            foreach (Expense expense in currentExpenses)
-            {
-                TransactionalExpenseCategory transactionalExpenseCategory = indexedTransactionalExpenseCategories[expense.ExpenseCategoryCode];
-                ExpenseWithTransactionCategoryDetail expenseWithTransactionCategoryDetail = ExpenseWithTransactionCategoryDetail.From(expense, transactionalExpenseCategory);
-                expenseWithTransactionCategoryDetails.Add(expenseWithTransactionCategoryDetail);
-            }
-
-            return expenseWithTransactionCategoryDetails;
+            return await _listExpenseResponseMapper.MapAsync(currentExpenses);
         }
 
         public async Task<IEnumerable<ListExpenseResponse>> GetCurrentTop10ExpensesAsync()
