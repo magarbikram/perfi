@@ -7,6 +7,7 @@ using Perfi.Core.Accounts.AccountingTransactionAggregate;
 using Perfi.Core.Accounts.CashAccountAggregate;
 using Perfi.Core.Earnings;
 using Perfi.Core.Earnings.IncomeSources;
+using Perfi.Core.Payments.IncomingPayments;
 
 namespace Perfi.Api.Services
 {
@@ -16,26 +17,35 @@ namespace Perfi.Api.Services
         private readonly ICashAccountRepository _cashAccountRepository;
         private readonly IIncomeSourceRepository _incomeSourceRepository;
         private readonly IAccountingTransactionRepository _accountingTransactionRepository;
+        private readonly IIncomingPaymentRepository _incomingPaymentRepository;
 
         private Money RemainderDebitAmount { get; set; }
         public AddNewIncomeService(
             IIncomeDocumentRepository incomeDocumentRepository,
             ICashAccountRepository cashAccountRepository,
             IIncomeSourceRepository incomeSourceRepository,
-            IAccountingTransactionRepository accountingTransactionRepository)
+            IAccountingTransactionRepository accountingTransactionRepository,
+            IIncomingPaymentRepository incomingPaymentRepository)
         {
             _incomeDocumentRepository = incomeDocumentRepository;
             _cashAccountRepository = cashAccountRepository;
             _incomeSourceRepository = incomeSourceRepository;
             _accountingTransactionRepository = accountingTransactionRepository;
+            _incomingPaymentRepository = incomingPaymentRepository;
         }
         public async Task<NewIncomeAddedResponse> AddAsync(AddNewIncomeCommand addJobIncomeCommand)
         {
             IncomeDocument incomeDocument = await AddIncomeDocumentAsync(addJobIncomeCommand);
+            AddIncomingPaymentAsync(incomeDocument);
             AccountingTransaction transaction = await AddTransactionForIncomeDocumentAsync(incomeDocument);
             await SetIncomeDocumentTransactionAsync(incomeDocument, transaction);
             return NewIncomeAddedResponse.From(incomeDocument);
+        }
 
+        private void AddIncomingPaymentAsync(IncomeDocument incomeDocument)
+        {
+            IncomingPayment incomingPayment = IncomingPayment.From(incomeDocument);
+            _incomingPaymentRepository.Add(incomingPayment);
         }
 
         private async Task SetIncomeDocumentTransactionAsync(IncomeDocument incomeDocument, AccountingTransaction transaction)

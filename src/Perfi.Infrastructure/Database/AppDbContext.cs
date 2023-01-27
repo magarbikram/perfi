@@ -7,6 +7,10 @@ using Perfi.Core.Accounts.LoanAggregate;
 using Perfi.Core.Earnings;
 using Perfi.Core.Earnings.IncomeSources;
 using Perfi.Core.Expenses;
+using Perfi.Core.MoneyTransfers;
+using Perfi.Core.Payments.IncomingPayments;
+using Perfi.Core.Payments.LoanPayments;
+using Perfi.Core.Payments.OutgoingPayments;
 using Perfi.Core.SplitPartners;
 using Perfi.SharedKernel;
 using System.Reflection;
@@ -27,6 +31,10 @@ namespace Perfi.Infrastructure.Database
         public DbSet<IncomeSource> IncomeSources { get; set; }
         public DbSet<IncomeDocument> IncomeDocuments { get; set; }
         public DbSet<SplitPartner> SplitPartners { get; set; }
+        public DbSet<MoneyTransfer> MoneyTransfers { get; set; }
+        public DbSet<IncomingPayment> IncomingPayments { get; set; }
+        public DbSet<OutgoingPayment> OutgoingPayments { get; set; }
+        public DbSet<LoanPayment> LoanPayments { get; set; }
         public AppDbContext(DbContextOptions options) : base(options)
         {
         }

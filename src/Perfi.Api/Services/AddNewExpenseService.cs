@@ -9,6 +9,7 @@ using Perfi.Core.Accounts.AccountingTransactionAggregate;
 using Perfi.Core.Accounts.CashAccountAggregate;
 using Perfi.Core.Accounts.CreditCardAggregate;
 using Perfi.Core.Expenses;
+using Perfi.Core.Payments.OutgoingPayments;
 using Perfi.Core.SplitPartners;
 
 namespace Perfi.Api.Services
@@ -23,6 +24,8 @@ namespace Perfi.Api.Services
         private readonly ITransactionalAccountRepository _transactionalAccountRepository;
         private readonly ITransactionalExpenseCategoryRepository _transactionalExpenseCategoryRepository;
         private readonly ISplitPartnerRepository _splitPartnerRepository;
+        private readonly IAddOutgoingPaymentService _addOutgoingPaymentService;
+        private readonly IOutgoingPaymentRepository _outgoingPaymentRepository;
 
         public AddNewExpenseService(
             IExpenseRepository expenseRepository,
@@ -32,7 +35,8 @@ namespace Perfi.Api.Services
             ILogger<AddNewExpenseService> logger,
             ITransactionalAccountRepository transactionalAccountRepository,
             ITransactionalExpenseCategoryRepository transactionalExpenseCategoryRepository,
-            ISplitPartnerRepository splitPartnerRepository)
+            ISplitPartnerRepository splitPartnerRepository,
+            IAddOutgoingPaymentService addOutgoingPaymentService)
         {
             _expenseRepository = expenseRepository;
             _accountingTransactionRepository = accountingTransactionRepository;
@@ -42,14 +46,21 @@ namespace Perfi.Api.Services
             _transactionalAccountRepository = transactionalAccountRepository;
             _transactionalExpenseCategoryRepository = transactionalExpenseCategoryRepository;
             _splitPartnerRepository = splitPartnerRepository;
+            _addOutgoingPaymentService = addOutgoingPaymentService;
         }
         public async Task<NewExpenseAddedResponse> AddAsync(AddNewExpenseCommand addNewExpenseCommand)
         {
             Expense expense = await AddNewExpenseAsync(addNewExpenseCommand);
+            AddOutgoingPayment(expense, Money.UsdFrom(addNewExpenseCommand.Amount));
             AccountingTransaction accountingTransaction = await AddAccountingTransactionRelatedToExpenseAsync(expense);
             await SetAccountingTransactionInExpense(expense, accountingTransaction);
             TransactionalExpenseCategory transactionalExpenseCategory = await FindTransactionalExpenseCategoryByCodeAsync(expense.ExpenseCategoryCode);
             return NewExpenseAddedResponse.From(expense, transactionalExpenseCategory);
+        }
+
+        private void AddOutgoingPayment(Expense expense, Money totalOutgoingPaymentAmount)
+        {
+            _addOutgoingPaymentService.AddOutGoingPaymentFor(expense, totalOutgoingPaymentAmount);
         }
 
         private async Task SetAccountingTransactionInExpense(Expense expense, AccountingTransaction accountingTransaction)

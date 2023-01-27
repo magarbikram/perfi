@@ -5,6 +5,6 @@ namespace Perfi.Api.Services
 {
     public interface IPayCreditCardService
     {
-        Task<NewExpenseAddedResponse> PayAsync(PayCreditCardCommand payCreditCardCommand);
+        Task<NewMoneyTransferResponse> PayAsync(PayCreditCardCommand payCreditCardCommand);
     }
 }

@@ -5,6 +5,6 @@ namespace Perfi.Api.Services
 {
     public interface IPayLoanService
     {
-        Task<NewExpenseAddedResponse> PayAsync(PayLoanCommand payLoanCommand);
+        Task<NewLoanPaymentAddedResponse> PayAsync(PayLoanCommand payLoanCommand);
     }
 }

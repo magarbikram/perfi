@@ -1,4 +1,5 @@
 ﻿using Perfi.Core.Accounting;
+using Perfi.Core.Expenses.QueryModels;
 using Perfi.SharedKernel;
 
 namespace Perfi.Core.Expenses
@@ -10,5 +11,6 @@ namespace Perfi.Core.Expenses
         Task<IEnumerable<Expense>> GetAllForTransactionPeriodAsync(TransactionPeriod transactionPeriod);
         Task<IEnumerable<Expense>> GetTop10ExpensesForTransactionPeriodAsync(TransactionPeriod transactionPeriod);
         void Update(Expense expense);
+        Task<IEnumerable<ExpenseByCategory>> GetExpenseByCategoryAsync(TransactionPeriod transactionPeriod);
     }
 }

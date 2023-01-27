@@ -2,29 +2,32 @@
 using Perfi.Core.Accounting;
 using Perfi.Core.Earnings;
 using Perfi.Core.Expenses;
+using Perfi.Core.MoneyTransfers;
+using Perfi.Core.Payments.IncomingPayments;
+using Perfi.Core.Payments.OutgoingPayments;
 
 namespace Perfi.Api.Services
 {
     public class CashFlowReportService : ICashFlowReportService
     {
-        private readonly IIncomeDocumentRepository _incomeDocumentRepository;
-        private readonly IExpenseRepository _expenseRepository;
+        private readonly IIncomingPaymentRepository _incomingPaymentRepository;
+        private readonly IOutgoingPaymentRepository _outgoingPaymentRepository;
 
         public CashFlowReportService(
-            IIncomeDocumentRepository incomeDocumentRepository,
-            IExpenseRepository expenseRepository)
+            IIncomingPaymentRepository incomingPaymentRepository,
+            IOutgoingPaymentRepository outgoingPaymentRepository)
         {
-            _incomeDocumentRepository = incomeDocumentRepository;
-            _expenseRepository = expenseRepository;
+            _incomingPaymentRepository = incomingPaymentRepository;
+            _outgoingPaymentRepository = outgoingPaymentRepository;
         }
 
         public async Task<CashFlowSummaryResponse> GetCurrentPeriodCashFlowSummaryAsync()
         {
             TransactionPeriod currentTransactionPeriod = TransactionPeriod.CurrentPeriod();
-            Money totalIncomeAmount = await _incomeDocumentRepository.GetTotalIncomeAmountForPeriodAsync(currentTransactionPeriod);
-            Money totalExpenseAmount = await _expenseRepository.GetTotalExpenseAmountForPeriodAsync(currentTransactionPeriod);
+            Money totalIncomingAmount = await _incomingPaymentRepository.GetTotalAmountAsync(currentTransactionPeriod);
+            Money totalOutgoingAmount = await _outgoingPaymentRepository.GetTotalAmountAsync(currentTransactionPeriod);
 
-            return CashFlowSummaryResponse.From(currentTransactionPeriod, totalIncomeAmount, totalExpenseAmount);
+            return CashFlowSummaryResponse.From(currentTransactionPeriod, totalIncomingAmount, totalOutgoingAmount);
         }
     }
 }

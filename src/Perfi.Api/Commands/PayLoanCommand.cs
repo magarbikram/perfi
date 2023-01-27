@@ -10,13 +10,12 @@ namespace Perfi.Api.Commands
         [Required]
         public decimal PrincipalAmount { get; set; }
 
-        [Required]
-        public decimal InterestAmount { get; set; }
-
+        public decimal? InterestAmount { get; set; }
+        public decimal? EscrowAmount { get; set; }
         public decimal? FeeAmount { get; set; }
 
         [Required]
-        public PaymentMethodCommand PaymentMethod { get; set; }
+        public int PayWithCashAccountId { get; set; }
 
         [Required]
         public long TransactionUnixTimeMilliseconds { get; set; }

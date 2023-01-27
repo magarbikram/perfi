@@ -11,13 +11,16 @@ namespace Perfi.Api.Controllers
     {
         private readonly IAddLoanService _addLoanService;
         private readonly ILoanQueryService _cashAccountQueryService;
+        private readonly IPayLoanService _payLoanService;
 
         public LoansController(
             IAddLoanService addLoanService,
-            ILoanQueryService cashAccountQueryService)
+            ILoanQueryService cashAccountQueryService,
+            IPayLoanService payLoanService)
         {
             _addLoanService = addLoanService;
             _cashAccountQueryService = cashAccountQueryService;
+            _payLoanService = payLoanService;
         }
         [HttpPost]
         public async Task<ActionResult<NewLoanAddedResponse>> AddAsync([FromBody] AddNewLoanCommand addNewLoanCommand)
@@ -31,6 +34,13 @@ namespace Perfi.Api.Controllers
         {
             List<ListLoanResponse> listLoanResponses = await _cashAccountQueryService.GetAllAsync(withCurrentBalance);
             return Ok(listLoanResponses);
+        }
+
+        [HttpPost("Pay")]
+        public async Task<ActionResult<NewLoanPaymentAddedResponse>> PayLoanAsync([FromBody] PayLoanCommand payMortgageCommand)
+        {
+            NewLoanPaymentAddedResponse newLoanPaymentAddedResponse = await _payLoanService.PayAsync(payMortgageCommand);
+            return Created("", newLoanPaymentAddedResponse);
         }
     }
 }

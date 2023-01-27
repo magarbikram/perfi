@@ -29,5 +29,10 @@ namespace Perfi.Core.Expenses
         {
             yield return Value;
         }
+
+        public override string ToString()
+        {
+            return Value;
+        }
     }
 }

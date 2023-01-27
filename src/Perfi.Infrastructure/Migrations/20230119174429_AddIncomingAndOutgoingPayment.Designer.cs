@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Perfi.Infrastructure.Database;
@@ -11,9 +12,11 @@ using Perfi.Infrastructure.Database;
 namespace Perfi.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230119174429_AddIncomingAndOutgoingPayment")]
+    partial class AddIncomingAndOutgoingPayment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -485,40 +488,6 @@ namespace Perfi.Infrastructure.Migrations
                     b.HasIndex("TransactionPeriod");
 
                     b.ToTable("IncomingPayment", (string)null);
-                });
-
-            modelBuilder.Entity("Perfi.Core.Payments.LoanPayments.LoanPayment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTimeOffset>("DocumentDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("LoanId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTimeOffset>("TransactionDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("TransactionId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("TransactionPeriod")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TransactionDate");
-
-                    b.HasIndex("TransactionPeriod");
-
-                    b.ToTable("LoanPayment", (string)null);
                 });
 
             modelBuilder.Entity("Perfi.Core.Payments.OutgoingPayments.OutgoingPayment", b =>
@@ -1040,126 +1009,6 @@ namespace Perfi.Infrastructure.Migrations
                         });
 
                     b.Navigation("Amount")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Perfi.Core.Payments.LoanPayments.LoanPayment", b =>
-                {
-                    b.OwnsOne("Perfi.Core.Accounting.Money", "EscrowAmount", b1 =>
-                        {
-                            b1.Property<int>("LoanPaymentId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("Currency")
-                                .IsRequired()
-                                .HasMaxLength(4)
-                                .HasColumnType("character varying(4)");
-
-                            b1.Property<decimal>("Value")
-                                .HasColumnType("numeric");
-
-                            b1.HasKey("LoanPaymentId");
-
-                            b1.ToTable("LoanPayment");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LoanPaymentId");
-                        });
-
-                    b.OwnsOne("Perfi.Core.Accounting.Money", "FeeAmount", b1 =>
-                        {
-                            b1.Property<int>("LoanPaymentId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("Currency")
-                                .IsRequired()
-                                .HasMaxLength(4)
-                                .HasColumnType("character varying(4)");
-
-                            b1.Property<decimal>("Value")
-                                .HasColumnType("numeric");
-
-                            b1.HasKey("LoanPaymentId");
-
-                            b1.ToTable("LoanPayment");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LoanPaymentId");
-                        });
-
-                    b.OwnsOne("Perfi.Core.Accounting.Money", "InterestAmount", b1 =>
-                        {
-                            b1.Property<int>("LoanPaymentId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("Currency")
-                                .IsRequired()
-                                .HasMaxLength(4)
-                                .HasColumnType("character varying(4)");
-
-                            b1.Property<decimal>("Value")
-                                .HasColumnType("numeric");
-
-                            b1.HasKey("LoanPaymentId");
-
-                            b1.ToTable("LoanPayment");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LoanPaymentId");
-                        });
-
-                    b.OwnsOne("Perfi.Core.Accounting.Money", "PrincipalAmount", b1 =>
-                        {
-                            b1.Property<int>("LoanPaymentId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("Currency")
-                                .IsRequired()
-                                .HasMaxLength(4)
-                                .HasColumnType("character varying(4)");
-
-                            b1.Property<decimal>("Value")
-                                .HasColumnType("numeric");
-
-                            b1.HasKey("LoanPaymentId");
-
-                            b1.ToTable("LoanPayment");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LoanPaymentId");
-                        });
-
-                    b.OwnsOne("Perfi.Core.Payments.LoanPayments.LoanPaymentMethod", "PaymentMethod", b1 =>
-                        {
-                            b1.Property<int>("LoanPaymentId")
-                                .HasColumnType("integer");
-
-                            b1.Property<int>("CashAccountId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("CashAccountNumber")
-                                .IsRequired()
-                                .HasMaxLength(20)
-                                .HasColumnType("character varying(20)");
-
-                            b1.HasKey("LoanPaymentId");
-
-                            b1.ToTable("LoanPayment");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LoanPaymentId");
-                        });
-
-                    b.Navigation("EscrowAmount");
-
-                    b.Navigation("FeeAmount");
-
-                    b.Navigation("InterestAmount");
-
-                    b.Navigation("PaymentMethod")
-                        .IsRequired();
-
-                    b.Navigation("PrincipalAmount")
                         .IsRequired();
                 });
 

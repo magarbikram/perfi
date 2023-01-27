@@ -7,7 +7,8 @@ using Perfi.Core.Accounting.AccountingTransactionAggregate;
 using Perfi.Core.Accounts.AccountingTransactionAggregate;
 using Perfi.Core.Accounts.CashAccountAggregate;
 using Perfi.Core.Accounts.CreditCardAggregate;
-using Perfi.Core.Expenses;
+using Perfi.Core.MoneyTransfers;
+using Perfi.Core.Payments.OutgoingPayments;
 
 namespace Perfi.Api.Services
 {
@@ -15,80 +16,70 @@ namespace Perfi.Api.Services
     {
         private readonly ICreditCardAccountRepository _creditCardAccountRepository;
         private readonly ICashAccountRepository _cashAccountRepository;
-        private readonly IExpenseRepository _expenseRepository;
-        private readonly ITransactionalExpenseCategoryRepository _transactionalExpenseCategoryRepository;
         private readonly IAccountingTransactionRepository _accountingTransactionRepository;
+        private readonly IMoneyTransferRepository _moneyTransferRepository;
+        private readonly IOutgoingPaymentRepository _outgoingPaymentRepository;
 
         public PayCreditCardService(ICreditCardAccountRepository creditCardAccountRepository,
             ICashAccountRepository cashAccountRepository,
-            IExpenseRepository expenseRepository,
-            ITransactionalExpenseCategoryRepository transactionalExpenseCategoryRepository,
-            IAccountingTransactionRepository accountingTransactionRepository)
+            IAccountingTransactionRepository accountingTransactionRepository,
+            IMoneyTransferRepository moneyTransferRepository,
+            IOutgoingPaymentRepository outgoingPaymentRepository)
         {
             _creditCardAccountRepository = creditCardAccountRepository;
             _cashAccountRepository = cashAccountRepository;
-            _expenseRepository = expenseRepository;
-            _transactionalExpenseCategoryRepository = transactionalExpenseCategoryRepository;
             _accountingTransactionRepository = accountingTransactionRepository;
+            _moneyTransferRepository = moneyTransferRepository;
+            _outgoingPaymentRepository = outgoingPaymentRepository;
         }
 
-        public async Task<NewExpenseAddedResponse> PayAsync(PayCreditCardCommand payCreditCardCommand)
+        public async Task<NewMoneyTransferResponse> PayAsync(PayCreditCardCommand payCreditCardCommand)
+        {
+            MoneyTransfer moneyTransfer = await AddMoneyTransferAsync(payCreditCardCommand);
+            AddOutgoingPayment(moneyTransfer);
+            AccountingTransaction accountingTransaction = await AddAccountingTransactionAsync(moneyTransfer);
+            await SetAccountingTransactionAsync(moneyTransfer, accountingTransaction);
+            return NewMoneyTransferResponse.From(moneyTransfer);
+        }
+
+        private async Task<MoneyTransfer> AddMoneyTransferAsync(PayCreditCardCommand payCreditCardCommand)
         {
             CreditCardAccount creditCardAccount = await FindCreditCardAccountByIdAsync(payCreditCardCommand.CreditCardId);
-            Expense expense = await AddExpenseAsync(payCreditCardCommand, creditCardAccount);
-            AccountingTransaction accountingTransaction = await AddAccountingTransactionAsync(creditCardAccount, expense);
-            await SetExpenseTransaction(expense, accountingTransaction);
-            TransactionalExpenseCategory transactionalExpenseCategory = await FindTransactionExpenseCategoryByCodeAsync(expense.ExpenseCategoryCode);
-            return NewExpenseAddedResponse.From(expense, transactionalExpenseCategory);
+            CashAccount cashAccount = await FindCashAccountByIdAsync(payCreditCardCommand.PayWithCashAccountId);
+            MoneyTransfer moneyTransfer = MoneyTransfer.New(remarks: $"Credit card '{creditCardAccount.Name}' payment",
+                                                            amount: Money.UsdFrom(payCreditCardCommand.Amount),
+                                                            fromAccountNumber: cashAccount.AssociatedAccountNumber,
+                                                            from: $"Cash Account '{cashAccount.Name}'",
+                                                            toAccountNumber: creditCardAccount.AssociatedAccountNumber,
+                                                            to: $"Credit card '{creditCardAccount.Name}-{creditCardAccount.LastFourDigits}'",
+                                                            transactionDate: DateTimeOffset.FromUnixTimeMilliseconds(payCreditCardCommand.TransactionUnixTimeMilliseconds));
+            _moneyTransferRepository.Add(moneyTransfer);
+            return moneyTransfer;
         }
 
-        private async Task SetExpenseTransaction(Expense expense, AccountingTransaction accountingTransaction)
+        private void AddOutgoingPayment(MoneyTransfer moneyTransfer)
         {
-            expense.SetAccountingTransaction(accountingTransaction);
-            _expenseRepository.Update(expense);
-            await _expenseRepository.UnitOfWork.SaveChangesAsync();
+            OutgoingPayment outgoingPayment = OutgoingPayment.From(description: $"Paid by cash: '{moneyTransfer.From}' for credit card: {moneyTransfer.To}",
+                                                                              amount: moneyTransfer.Amount,
+                                                                              paidFromAccountNumber: moneyTransfer.FromAccountNumber,
+                                                                              transactionDate: moneyTransfer.TransactionDate);
+            _outgoingPaymentRepository.Add(outgoingPayment);
         }
 
-        private async Task<TransactionalExpenseCategory> FindTransactionExpenseCategoryByCodeAsync(ExpenseCategoryCode expenseCategoryCode)
+        private async Task SetAccountingTransactionAsync(MoneyTransfer moneyTransfer, AccountingTransaction accountingTransaction)
         {
-            Maybe<TransactionalExpenseCategory> maybeTransactionalExpenseCategory = await _transactionalExpenseCategoryRepository.GetByCodeAsync(expenseCategoryCode);
-            if (maybeTransactionalExpenseCategory.HasNoValue)
-            {
-                throw new ResourceNotFoundException($"Expense category with code '{expenseCategoryCode}' not found");
-            }
-            TransactionalExpenseCategory transactionalExpenseCategory = maybeTransactionalExpenseCategory.Value;
-            return transactionalExpenseCategory;
+            moneyTransfer.SetAccountingTransaction(accountingTransaction);
+            await _moneyTransferRepository.UnitOfWork.SaveChangesAsync();
         }
 
-        private async Task<AccountingTransaction> AddAccountingTransactionAsync(CreditCardAccount creditCardAccount, Expense expense)
+        private async Task<AccountingTransaction> AddAccountingTransactionAsync(MoneyTransfer moneyTransfer)
         {
-            AccountingEntry debitAccountingEntry = AccountingEntry.Debit(creditCardAccount.AssociatedAccountNumber,
-                                                                                amount: expense.Amount,
-                                                                                transactionDate: expense.TransactionDate);
-
-            AccountingEntry creditAccountingEntry = AccountingEntry.Credit(expense.PaymentMethod.GetAssociatedAccountNumber(),
-                                                                    amount: expense.Amount,
-                                                                    transactionDate: expense.TransactionDate);
-
-            AccountingTransaction accountingTransaction = AccountingTransaction.New(expense.TransactionDate,
-                                                                                    expense.Description,
-                                                                                    debitAccountingEntry,
-                                                                                    creditAccountingEntry
-                                                                                    );
+            AccountingEntry debitEntry = AccountingEntry.Debit(moneyTransfer.ToAccountNumber, moneyTransfer.Amount, moneyTransfer.TransactionDate);
+            AccountingEntry creditEntry = AccountingEntry.Credit(moneyTransfer.FromAccountNumber, moneyTransfer.Amount, moneyTransfer.TransactionDate);
+            AccountingTransaction accountingTransaction = AccountingTransaction.New(moneyTransfer.TransactionDate, moneyTransfer.Remarks, debitEntry, creditEntry);
             accountingTransaction = _accountingTransactionRepository.Add(accountingTransaction);
             await _accountingTransactionRepository.UnitOfWork.SaveChangesAsync();
             return accountingTransaction;
-        }
-
-        private async Task<Expense> AddExpenseAsync(PayCreditCardCommand payCreditCardCommand, CreditCardAccount creditCardAccount)
-        {
-            CashAccount cashAccount = await FindCashAccountByIdAsync(payCreditCardCommand.PayWithCashAccountId);
-            Expense expense = Expense.NewCashAccountExpense(description: $"Credit Card '{creditCardAccount.Name}-{creditCardAccount.LastFourDigits}' Payment",
-                                                            transactionDate: DateTimeOffset.FromUnixTimeMilliseconds(payCreditCardCommand.TransactionUnixTimeMilliseconds),
-                                                            expenseCategoryCode: ExpenseCategoryCode.DebtPayment,
-                                                            amount: Money.UsdFrom(payCreditCardCommand.Amount),
-                                                            cashAccount);
-            return expense;
         }
 
         private async Task<CashAccount> FindCashAccountByIdAsync(int payWithCashAccountId)

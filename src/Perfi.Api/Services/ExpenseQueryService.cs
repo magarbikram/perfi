@@ -1,6 +1,8 @@
 ﻿using Perfi.Api.Models;
 using Perfi.Api.Responses;
+using Perfi.Core.Accounting;
 using Perfi.Core.Expenses;
+using Perfi.Core.Expenses.QueryModels;
 
 namespace Perfi.Api.Services
 {
@@ -49,6 +51,12 @@ namespace Perfi.Api.Services
             TransactionPeriod currentTransactionPeriod = TransactionPeriod.For(DateTimeOffset.Now);
             IEnumerable<Expense> currentExpenses = await _expenseRepository.GetTop10ExpensesForTransactionPeriodAsync(transactionPeriod: currentTransactionPeriod);
             return await MapToResponsesAsync(currentExpenses);
+        }
+
+        public async Task<IEnumerable<ExpenseBySummaryCategoryResponse>> GetCurrentExpensesByCategoryAsync()
+        {
+            IEnumerable<ExpenseByCategory> expenseByCategories = await _expenseRepository.GetExpenseByCategoryAsync(TransactionPeriod.CurrentPeriod());
+            return ExpenseBySummaryCategoryResponse.From(expenseByCategories);
         }
     }
 }

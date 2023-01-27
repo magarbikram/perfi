@@ -9,6 +9,10 @@ using Perfi.Core.Accounts.LoanAggregate;
 using Perfi.Core.Earnings;
 using Perfi.Core.Earnings.IncomeSources;
 using Perfi.Core.Expenses;
+using Perfi.Core.MoneyTransfers;
+using Perfi.Core.Payments.IncomingPayments;
+using Perfi.Core.Payments.LoanPayments;
+using Perfi.Core.Payments.OutgoingPayments;
 using Perfi.Core.SplitPartners;
 using Perfi.Infrastructure.Database;
 using Perfi.Infrastructure.Database.Repositories;
@@ -51,6 +55,10 @@ builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<IIncomeSourceRepository, IncomeSourceRepository>();
 builder.Services.AddScoped<IIncomeDocumentRepository, IncomeDocumentRepository>();
 builder.Services.AddScoped<ISplitPartnerRepository, SplitPartnerRepository>();
+builder.Services.AddScoped<IMoneyTransferRepository, MoneyTransferRepository>();
+builder.Services.AddScoped<IIncomingPaymentRepository, IncomingPaymentRepository>();
+builder.Services.AddScoped<IOutgoingPaymentRepository, OutgoingPaymentRepository>();
+builder.Services.AddScoped<ILoanPaymentRepository, LoanPaymentRepository>();
 
 //services
 builder.Services.AddScoped<IAddCashAccountService, AddCashAccountService>();
@@ -72,14 +80,16 @@ builder.Services.AddScoped<IIncomeSourceQueryService, IncomeSourceQueryService>(
 builder.Services.AddScoped<IAddNewIncomeService, AddNewIncomeService>();
 builder.Services.AddScoped<IIncomeDocumentQueryService, IncomeDocumentQueryService>();
 builder.Services.AddScoped<ICashFlowReportService, CashFlowReportService>();
+builder.Services.AddScoped<IAddOutgoingPaymentService, AddOutgoingPaymentService>();
 
-builder.Services.AddScoped<IPayMortgageService, PayMortgageService>();
 builder.Services.AddScoped<IPayCreditCardService, PayCreditCardService>();
 builder.Services.AddScoped<IPayLoanService, PayLoanService>();
 builder.Services.AddScoped<ICalculateCurrentBalanceService, CalculateCurrentBalanceService>();
 builder.Services.AddScoped<IBuildSummaryAccountResponseService, BuildSummaryAccountResponseService>();
 builder.Services.AddScoped<IAddSplitPartnerService, AddSplitPartnerService>();
 builder.Services.AddScoped<ISplitPartnerQueryService, SplitPartnerQueryService>();
+builder.Services.AddScoped<ITransferMoneyService, TransferMoneyService>();
+builder.Services.AddScoped<IMoneyTransferQueryService, MoneyTransferQueryService>();
 
 var app = builder.Build();
 app.UseCors();
