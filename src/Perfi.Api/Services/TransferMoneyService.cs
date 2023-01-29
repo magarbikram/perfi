@@ -7,6 +7,8 @@ using Perfi.Core.Accounting.AccountingTransactionAggregate;
 using Perfi.Core.Accounts.AccountAggregate;
 using Perfi.Core.Accounts.AccountingTransactionAggregate;
 using Perfi.Core.Accounts.CashAccountAggregate;
+using Perfi.Core.Accounts.CreditCardAggregate;
+using Perfi.Core.Accounts.LoanAggregate;
 using Perfi.Core.MoneyTransfers;
 using Perfi.Core.Payments.IncomingPayments;
 using Perfi.Core.Payments.OutgoingPayments;
@@ -22,13 +24,17 @@ namespace Perfi.Api.Services
         private readonly IAccountingTransactionRepository _accountingTransactionRepository;
         private readonly IOutgoingPaymentRepository _outgoingPaymentRepository;
         private readonly IIncomingPaymentRepository _incomingPaymentRepository;
+        private readonly ILoanRepository _loanRepository;
+        private readonly ICreditCardAccountRepository _creditCardAccountRepository;
 
         public TransferMoneyService(IMoneyTransferRepository moneyTransferRepository,
             ISplitPartnerRepository splitPartnerRepository,
             ICashAccountRepository cashAccountRepository,
             IAccountingTransactionRepository accountingTransactionRepository,
             IOutgoingPaymentRepository outgoingPaymentRepository,
-            IIncomingPaymentRepository incomingPaymentRepository)
+            IIncomingPaymentRepository incomingPaymentRepository,
+            ILoanRepository loanRepository,
+            ICreditCardAccountRepository creditCardAccountRepository)
         {
             _moneyTransferRepository = moneyTransferRepository;
             _splitPartnerRepository = splitPartnerRepository;
@@ -36,6 +42,8 @@ namespace Perfi.Api.Services
             _accountingTransactionRepository = accountingTransactionRepository;
             _outgoingPaymentRepository = outgoingPaymentRepository;
             _incomingPaymentRepository = incomingPaymentRepository;
+            _loanRepository = loanRepository;
+            _creditCardAccountRepository = creditCardAccountRepository;
         }
         public async Task<NewMoneyTransferResponse> TransferAsync(TransferMoneyCommand transferMoneyCommand)
         {
@@ -60,14 +68,14 @@ namespace Perfi.Api.Services
 
         private static bool IsIncomingPayment(TransferMoneyCommand transferMoneyCommand)
         {
-            return transferMoneyCommand.FromAccount.Type == TransferAccountType.SplitPartner &&
+            return transferMoneyCommand.FromAccount.Type != TransferAccountType.CashAccount &&
                                  transferMoneyCommand.ToAccount.Type == TransferAccountType.CashAccount;
         }
 
         private static bool IsOutgoingPayment(TransferMoneyCommand transferMoneyCommand)
         {
             return transferMoneyCommand.FromAccount.Type == TransferAccountType.CashAccount &&
-                            transferMoneyCommand.ToAccount.Type == TransferAccountType.SplitPartner;
+                            transferMoneyCommand.ToAccount.Type != TransferAccountType.CashAccount;
         }
 
         private void AddOutgoingPayment(TransferMoneyCommand transferMoneyCommand, MoneyTransfer moneyTransfer)
@@ -167,29 +175,61 @@ namespace Perfi.Api.Services
 
         private async Task<string> GetAccountNameAsync(TransferAccount transferAccount)
         {
-            if (transferAccount.Type == TransferAccountType.CashAccount)
+            switch (transferAccount.Type)
             {
-                CashAccount cashAccount = await FindCashAccountByIdAsync(transferAccount.CashAccountId!.Value);
-                return cashAccount.Name;
+                case TransferAccountType.CashAccount:
+                    CashAccount cashAccount = await FindCashAccountByIdAsync(transferAccount.CashAccountId!.Value);
+                    return cashAccount.Name;
+                case TransferAccountType.SplitPartner:
+                    SplitPartner splitPartner = await FindSplitPartnerByIdAsync(transferAccount.SplitPartnerId!.Value);
+                    return splitPartner.Name;
+                case TransferAccountType.CreditCard:
+                    CreditCardAccount creditCardAccount = await FindCreditCardByIdAsync(transferAccount.CreditCardId!.Value);
+                    return creditCardAccount.Name;
+                case TransferAccountType.Loan:
+                    Loan loan = await FindLoanByIdAsync(transferAccount.LoanId!.Value);
+                    return loan.Name;
+                default: throw new NotSupportedException($"Transfer account type: '{transferAccount.Type}' is not supported");
             }
-            else
+        }
+
+        private async Task<Loan> FindLoanByIdAsync(int loanId)
+        {
+            Maybe<Loan> maybeLoan = await _loanRepository.GetByIdAsync(loanId);
+            if (maybeLoan.HasNoValue)
             {
-                SplitPartner splitPartner = await FindSplitPartnerByIdAsync(transferAccount.SplitPartnerId!.Value);
-                return splitPartner.Name;
+                throw new ResourceNotFoundException($"Loan with id '{loanId}' not found");
             }
+            return maybeLoan.Value;
+        }
+
+        private async Task<CreditCardAccount> FindCreditCardByIdAsync(int creditCardId)
+        {
+            Maybe<CreditCardAccount> maybeCreditCardAccount = await _creditCardAccountRepository.GetByIdAsync(creditCardId);
+            if (maybeCreditCardAccount.HasNoValue)
+            {
+                throw new ResourceNotFoundException($"CreditCardAccount with id '{creditCardId}' not found");
+            }
+            return maybeCreditCardAccount.Value;
         }
 
         private async Task<AccountNumber> GetAccountNumberAsync(TransferAccount transferAccount)
         {
-            if (transferAccount.Type == TransferAccountType.CashAccount)
+            switch (transferAccount.Type)
             {
-                CashAccount cashAccount = await FindCashAccountByIdAsync(transferAccount.CashAccountId!.Value);
-                return cashAccount.AssociatedAccountNumber;
-            }
-            else
-            {
-                SplitPartner splitPartner = await FindSplitPartnerByIdAsync(transferAccount.SplitPartnerId!.Value);
-                return splitPartner.ReceivableAccountNumber;
+                case TransferAccountType.CashAccount:
+                    CashAccount cashAccount = await FindCashAccountByIdAsync(transferAccount.CashAccountId!.Value);
+                    return cashAccount.AssociatedAccountNumber;
+                case TransferAccountType.SplitPartner:
+                    SplitPartner splitPartner = await FindSplitPartnerByIdAsync(transferAccount.SplitPartnerId!.Value);
+                    return splitPartner.ReceivableAccountNumber;
+                case TransferAccountType.CreditCard:
+                    CreditCardAccount creditCardAccount = await FindCreditCardByIdAsync(transferAccount.CreditCardId!.Value);
+                    return creditCardAccount.AssociatedAccountNumber;
+                case TransferAccountType.Loan:
+                    Loan loan = await FindLoanByIdAsync(transferAccount.LoanId!.Value);
+                    return loan.AssociatedAccountNumber;
+                default: throw new NotSupportedException($"Transfer account type: '{transferAccount.Type}' is not supported");
             }
         }
     }

@@ -2,6 +2,6 @@
 {
     public enum TransferAccountType
     {
-        CashAccount, SplitPartner
+        CashAccount, SplitPartner, CreditCard, Loan
     }
 }
