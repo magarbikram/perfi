@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Perfi.Api.Commands;
 using Perfi.Api.Responses;
 using Perfi.Api.Services;
+using Perfi.Core.Expenses;
 
 namespace Perfi.Api.Controllers
 {
@@ -36,6 +37,14 @@ namespace Perfi.Api.Controllers
         public async Task<ActionResult<IEnumerable<ListSplitPartnerResponse>>> GetAllWithCurrentBalanceAsync()
         {
             return Ok(await _splitPartnerQueryService.GetAllWithCurrentBalanceAsync());
+        }
+
+
+        [HttpGet("{splitPartnerId}/Transactions/CurrentPeriod")]
+        public async Task<ActionResult<List<TransactionResponse>>> GetTransactionsAsync(int splitPartnerId)
+        {
+            List<TransactionResponse> transactions = await _splitPartnerQueryService.GetAllTransactionsAsync(splitPartnerId, TransactionPeriod.CurrentPeriod());
+            return Ok(transactions);
         }
     }
 }

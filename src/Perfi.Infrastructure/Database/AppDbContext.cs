@@ -23,6 +23,7 @@ namespace Perfi.Infrastructure.Database
         public DbSet<CreditCardAccount> CreditCardAccounts { get; set; }
         public DbSet<SummaryAccount> SummaryAccounts { get; set; }
         public DbSet<TransactionalAccount> TransactionalAccounts { get; set; }
+        public DbSet<AccountingTransaction> AccountingTransactions { get; set; }
         public DbSet<AccountingEntry> AccountingEntries { get; set; }
         public DbSet<SummaryExpenseCategory> SummaryExpenseCategories { get; set; }
         public DbSet<TransactionalExpenseCategory> TransactionalExpenseCategories { get; set; }

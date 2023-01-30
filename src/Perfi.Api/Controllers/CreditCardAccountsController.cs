@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Perfi.Api.Commands;
 using Perfi.Api.Responses;
 using Perfi.Api.Services;
+using Perfi.Core.Expenses;
 
 namespace Perfi.Api.Controllers
 {
@@ -35,6 +36,13 @@ namespace Perfi.Api.Controllers
         {
             List<ListCreditCardAccountResponse> listCreditCardAccountResponses = await _creditCardAccountQueryService.GetAllAsync(withCurrentBalance);
             return Ok(listCreditCardAccountResponses);
+        }
+
+        [HttpGet("{creditCardId}/Transactions/CurrentPeriod")]
+        public async Task<ActionResult<List<TransactionResponse>>> GetTransactionsAsync(int creditCardId)
+        {
+            List<TransactionResponse> transactions = await _creditCardAccountQueryService.GetAllTransactionsAsync(creditCardId, TransactionPeriod.CurrentPeriod());
+            return Ok(transactions);
         }
     }
 }

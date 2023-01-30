@@ -2,6 +2,7 @@
 using Perfi.Api.Commands;
 using Perfi.Api.Responses;
 using Perfi.Api.Services;
+using Perfi.Core.Expenses;
 
 namespace Perfi.Api.Controllers
 {
@@ -10,16 +11,16 @@ namespace Perfi.Api.Controllers
     public class LoansController : ControllerBase
     {
         private readonly IAddLoanService _addLoanService;
-        private readonly ILoanQueryService _cashAccountQueryService;
+        private readonly ILoanQueryService _loanQueryService;
         private readonly IPayLoanService _payLoanService;
 
         public LoansController(
             IAddLoanService addLoanService,
-            ILoanQueryService cashAccountQueryService,
+            ILoanQueryService loanQueryService,
             IPayLoanService payLoanService)
         {
             _addLoanService = addLoanService;
-            _cashAccountQueryService = cashAccountQueryService;
+            _loanQueryService = loanQueryService;
             _payLoanService = payLoanService;
         }
         [HttpPost]
@@ -32,7 +33,7 @@ namespace Perfi.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<List<ListLoanResponse>>> AllAsync(bool withCurrentBalance)
         {
-            List<ListLoanResponse> listLoanResponses = await _cashAccountQueryService.GetAllAsync(withCurrentBalance);
+            List<ListLoanResponse> listLoanResponses = await _loanQueryService.GetAllAsync(withCurrentBalance);
             return Ok(listLoanResponses);
         }
 
@@ -41,6 +42,14 @@ namespace Perfi.Api.Controllers
         {
             NewLoanPaymentAddedResponse newLoanPaymentAddedResponse = await _payLoanService.PayAsync(payMortgageCommand);
             return Created("", newLoanPaymentAddedResponse);
+        }
+
+
+        [HttpGet("{loanId}/Transactions/CurrentPeriod")]
+        public async Task<ActionResult<List<TransactionResponse>>> GetTransactionsAsync(int loanId)
+        {
+            List<TransactionResponse> transactions = await _loanQueryService.GetAllTransactionsAsync(loanId, TransactionPeriod.CurrentPeriod());
+            return Ok(transactions);
         }
     }
 }

@@ -2,6 +2,7 @@
 using Perfi.Api.Commands;
 using Perfi.Api.Responses;
 using Perfi.Api.Services;
+using Perfi.Core.Expenses;
 
 namespace Perfi.Api.Controllers
 {
@@ -31,6 +32,14 @@ namespace Perfi.Api.Controllers
         {
             List<ListCashAccountResponse> listCashAccountResponses = await _cashAccountQueryService.GetAllAsync(withCurrentBalance);
             return Ok(listCashAccountResponses);
+        }
+
+
+        [HttpGet("{cashAccountId}/Transactions/CurrentPeriod")]
+        public async Task<ActionResult<List<TransactionResponse>>> GetTransactionsAsync(int cashAccountId)
+        {
+            List<TransactionResponse> transactions = await _cashAccountQueryService.GetAllTransactionsAsync(cashAccountId, TransactionPeriod.CurrentPeriod());
+            return Ok(transactions);
         }
     }
 }

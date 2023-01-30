@@ -1,12 +1,8 @@
 ﻿using Perfi.Core.Accounting.AccountingTransactionAggregate;
 using Perfi.Core.Accounts.AccountAggregate;
+using Perfi.Core.Accounts.AccountingTransactionAggregate.QueryModels;
 using Perfi.Core.Expenses;
 using Perfi.SharedKernel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Perfi.Core.Accounts.AccountingTransactionAggregate
 {
@@ -14,5 +10,6 @@ namespace Perfi.Core.Accounts.AccountingTransactionAggregate
     {
         AccountingTransaction Add(AccountingTransaction accountingTransaction);
         Task<IEnumerable<AccountingEntry>> GetAccountingEntriesOfPeriodAsync(AccountNumber accountNumber, TransactionPeriod transactionPeriod);
+        Task<IEnumerable<Transaction>> GetAccountingTransactionsOfPeriodAsync(AccountNumber accountNumber, TransactionPeriod transactionPeriod);
     }
 }
