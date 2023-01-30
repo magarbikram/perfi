@@ -35,6 +35,7 @@ namespace Perfi.Infrastructure.Database.Repositories
             var query = from accountingEntry in _appDbContext.AccountingEntries.Where(ae => ae.AccountNumber == accountNumber && ae.TransactionPeriod == transactionPeriod)
                         join accountingTransaction in _appDbContext.AccountingTransactions
                         on EF.Property<int>(accountingEntry, "AccountingTransactionId") equals accountingTransaction.Id
+                        orderby accountingEntry.TransactionDate descending
                         select Transaction.From(accountingTransaction.Id,
                                                 accountingTransaction.Description,
                                                 accountingTransaction.TransactionDate,
