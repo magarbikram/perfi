@@ -5,7 +5,7 @@ namespace Perfi.Api.Commands
     public class PaymentShareCommand
     {
         [Required]
-        [Range(0.1, double.MaxValue)]
+        [Range(0.01, double.MaxValue)]
         public decimal OwnerShare { get; set; }
 
         [Required]
