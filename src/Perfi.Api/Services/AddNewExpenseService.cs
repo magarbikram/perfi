@@ -157,12 +157,12 @@ namespace Perfi.Api.Services
 
         private async Task<Expense> BuildNewSplitExpensePaidBySplitPartner(AddNewExpenseCommand addNewExpenseCommand)
         {
-            Money ownerShareExpenseAmount = Money.UsdFrom(addNewExpenseCommand.SplitPayment.PaymentShare.OwnerShare);
+            Money ownerShareExpenseAmount = Money.UsdFrom(addNewExpenseCommand.SplitPayment!.PaymentShare.OwnerShare);
             if (ownerShareExpenseAmount.IsZero())
             {
                 throw new ArgumentException($"Account holder expense amount should not be zero");
             }
-            Money splitPartnerShareExpenseAmount = Money.UsdFrom(addNewExpenseCommand.SplitPayment.PaymentShare.OwnerShare);
+            Money splitPartnerShareExpenseAmount = Money.UsdFrom(addNewExpenseCommand.SplitPayment.PaymentShare.SplitPartnerShare);
             SplitPartner splitPartner = await FindSplitPartnerByIdAsync(addNewExpenseCommand.SplitPayment.SplitPartnerId);
             return Expense.NewSplitExpensePaidBySplitPartner(description: addNewExpenseCommand.Description,
                                              transactionDate: DateTimeOffset.FromUnixTimeMilliseconds(addNewExpenseCommand.TransactionDateUnixTimeStamp),

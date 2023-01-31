@@ -23,6 +23,7 @@ namespace Perfi.Core.Accounts.AccountAggregate
             Guard.Against.NullOrEmpty(name, nameof(name));
             Guard.Against.OutOfRange(name.Length, nameof(name), rangeFrom: 1, rangeTo: NameMaxLength);
         }
+
         public AccountCategory AccountCategory { get; }
 
         public AccountNumber Number { get; private set; }

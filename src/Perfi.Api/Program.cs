@@ -92,6 +92,7 @@ builder.Services.AddScoped<ISplitPartnerQueryService, SplitPartnerQueryService>(
 builder.Services.AddScoped<ITransferMoneyService, TransferMoneyService>();
 builder.Services.AddScoped<IMoneyTransferQueryService, MoneyTransferQueryService>();
 builder.Services.AddScoped<ListExpenseResponseMapper>();
+builder.Services.AddScoped<ICloseCurrentTransactionPeriodService, CloseCurrentTransactionPeriodService>();
 var app = builder.Build();
 app.UseCors();
 // Configure the HTTP request pipeline.

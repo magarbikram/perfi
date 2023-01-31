@@ -64,5 +64,18 @@ namespace Perfi.Infrastructure.Database.Repositories
         {
             return await _appDbContext.TransactionalAccounts.Where(ta => accountNumbers.Contains(ta.Number)).ToListAsync();
         }
+
+        public void Update(TransactionalAccount account)
+        {
+            _appDbContext.TransactionalAccounts.Update(account);
+        }
+
+        public async Task<IEnumerable<TransactionalAccount>> GetAccountsForClosingAsync()
+        {
+            return await _appDbContext.TransactionalAccounts
+                                        .Where(ta => ta.AccountCategory == AccountCategory.Assets ||
+                                                     ta.AccountCategory == AccountCategory.Liabilities)
+                                        .ToListAsync();
+        }
     }
 }

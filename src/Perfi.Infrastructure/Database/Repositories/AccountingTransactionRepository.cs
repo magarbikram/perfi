@@ -36,7 +36,7 @@ namespace Perfi.Infrastructure.Database.Repositories
                         join accountingTransaction in _appDbContext.AccountingTransactions
                         on EF.Property<int>(accountingEntry, "AccountingTransactionId") equals accountingTransaction.Id
                         orderby accountingEntry.TransactionDate descending
-                        select Transaction.From(accountingTransaction.Id,
+                        select Transaction.From(accountingEntry.Id,
                                                 accountingTransaction.Description,
                                                 accountingTransaction.TransactionDate,
                                                 accountingEntry.DebitAmount,
