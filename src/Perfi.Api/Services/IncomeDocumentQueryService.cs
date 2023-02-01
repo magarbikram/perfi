@@ -15,7 +15,7 @@ namespace Perfi.Api.Services
         }
         public async Task<IEnumerable<ListIncomeResponse>> GetCurrentIncomesAsync()
         {
-            TransactionPeriod currentTransactionPeriod = TransactionPeriod.For(DateTimeOffset.Now);
+            TransactionPeriod currentTransactionPeriod = TransactionPeriod.CurrentPeriod();
             IEnumerable<IncomeDocument> currentIncomes = await _incomeDocumentRepository.GetAllForTransactionPeriodAsync(transactionPeriod: currentTransactionPeriod);
             return MapToResponses(currentIncomes);
         }
@@ -27,7 +27,7 @@ namespace Perfi.Api.Services
 
         public async Task<IEnumerable<ListIncomeResponse>> GetCurrentTop10IncomesAsync()
         {
-            TransactionPeriod currentTransactionPeriod = TransactionPeriod.For(DateTimeOffset.Now);
+            TransactionPeriod currentTransactionPeriod = TransactionPeriod.CurrentPeriod();
             IEnumerable<IncomeDocument> currentIncomes = await _incomeDocumentRepository.GetTop10IncomesForTransactionPeriodAsync(transactionPeriod: currentTransactionPeriod);
             return MapToResponses(currentIncomes);
         }

@@ -18,7 +18,7 @@ namespace Perfi.Api.Services
         }
         public async Task<IEnumerable<ListExpenseResponse>> GetCurrentExpensesAsync()
         {
-            TransactionPeriod currentTransactionPeriod = TransactionPeriod.For(DateTimeOffset.Now);
+            TransactionPeriod currentTransactionPeriod = TransactionPeriod.CurrentPeriod();
             IEnumerable<Expense> currentExpenses = await _expenseRepository.GetAllForTransactionPeriodAsync(transactionPeriod: currentTransactionPeriod);
             return await MapToResponsesAsync(currentExpenses);
         }
@@ -30,7 +30,7 @@ namespace Perfi.Api.Services
 
         public async Task<IEnumerable<ListExpenseResponse>> GetCurrentTop10ExpensesAsync()
         {
-            TransactionPeriod currentTransactionPeriod = TransactionPeriod.For(DateTimeOffset.Now);
+            TransactionPeriod currentTransactionPeriod = TransactionPeriod.CurrentPeriod();
             IEnumerable<Expense> currentExpenses = await _expenseRepository.GetTop10ExpensesForTransactionPeriodAsync(transactionPeriod: currentTransactionPeriod);
             return await MapToResponsesAsync(currentExpenses);
         }
