@@ -10,7 +10,9 @@ namespace Perfi.Core.Expenses
 
         public static TransactionPeriod CurrentPeriod()
         {
-            return For(DateTimeOffset.Now);
+            TimeSpan offset = TimeZoneInfo.FindSystemTimeZoneById("Mountain Standard Time").BaseUtcOffset;
+
+            return For(DateTimeOffset.UtcNow.ToOffset(offset));
         }
 
         public static TransactionPeriod For(DateTimeOffset transactionDate)
