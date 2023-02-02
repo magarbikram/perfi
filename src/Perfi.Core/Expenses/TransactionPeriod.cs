@@ -23,6 +23,12 @@ namespace Perfi.Core.Expenses
             };
         }
 
+        public static TransactionPeriod For(int year, int month)
+        {
+            DateTimeOffset transactionPeriodDate = new(year, month, 1, 1, 1, 1, TimeSpan.Zero);
+            return For(transactionPeriodDate);
+        }
+
         public static TransactionPeriod From(string value)
         {
             Guard.Against.NullOrWhiteSpace(value, nameof(value));

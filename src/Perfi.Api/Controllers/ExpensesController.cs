@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Perfi.Api.Commands;
 using Perfi.Api.Responses;
 using Perfi.Api.Services;
+using Perfi.Core.Expenses;
 
 namespace Perfi.Api.Controllers
 {
@@ -46,6 +47,14 @@ namespace Perfi.Api.Controllers
         public async Task<ActionResult<IEnumerable<ExpenseBySummaryCategoryResponse>>> ListCurrentExpensesByCategoryAsync()
         {
             IEnumerable<ExpenseBySummaryCategoryResponse> listExpenseResponses = await _expenseQueryService.GetCurrentExpensesByCategoryAsync();
+            return Ok(listExpenseResponses);
+        }
+
+        [HttpGet("ByCategory/TransactionPeriod/{year}/{month}")]
+        public async Task<ActionResult<IEnumerable<ExpenseBySummaryCategoryResponse>>> ListCurrentExpensesByCategoryAsync(int year, int month)
+        {
+
+            IEnumerable<ExpenseBySummaryCategoryResponse> listExpenseResponses = await _expenseQueryService.GetExpensesByCategoryAsync(TransactionPeriod.For(year, month));
             return Ok(listExpenseResponses);
         }
     }

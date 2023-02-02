@@ -1,8 +1,6 @@
 ﻿using Perfi.Api.Responses;
 using Perfi.Core.Accounting;
-using Perfi.Core.Earnings;
 using Perfi.Core.Expenses;
-using Perfi.Core.MoneyTransfers;
 using Perfi.Core.Payments.IncomingPayments;
 using Perfi.Core.Payments.OutgoingPayments;
 
@@ -21,13 +19,17 @@ namespace Perfi.Api.Services
             _outgoingPaymentRepository = outgoingPaymentRepository;
         }
 
+        public async Task<CashFlowSummaryResponse> GetCashFlowSummaryAsync(TransactionPeriod transactionPeriod)
+        {
+            Money totalIncomingAmount = await _incomingPaymentRepository.GetTotalAmountAsync(transactionPeriod);
+            Money totalOutgoingAmount = await _outgoingPaymentRepository.GetTotalAmountAsync(transactionPeriod);
+
+            return CashFlowSummaryResponse.From(transactionPeriod, totalIncomingAmount, totalOutgoingAmount);
+        }
+
         public async Task<CashFlowSummaryResponse> GetCurrentPeriodCashFlowSummaryAsync()
         {
-            TransactionPeriod currentTransactionPeriod = TransactionPeriod.CurrentPeriod();
-            Money totalIncomingAmount = await _incomingPaymentRepository.GetTotalAmountAsync(currentTransactionPeriod);
-            Money totalOutgoingAmount = await _outgoingPaymentRepository.GetTotalAmountAsync(currentTransactionPeriod);
-
-            return CashFlowSummaryResponse.From(currentTransactionPeriod, totalIncomingAmount, totalOutgoingAmount);
+            return await GetCashFlowSummaryAsync(TransactionPeriod.CurrentPeriod());
         }
     }
 }

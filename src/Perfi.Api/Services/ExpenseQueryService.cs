@@ -37,7 +37,12 @@ namespace Perfi.Api.Services
 
         public async Task<IEnumerable<ExpenseBySummaryCategoryResponse>> GetCurrentExpensesByCategoryAsync()
         {
-            IEnumerable<ExpenseByCategory> expenseByCategories = await _expenseRepository.GetExpenseByCategoryAsync(TransactionPeriod.CurrentPeriod());
+            return await GetExpensesByCategoryAsync(TransactionPeriod.CurrentPeriod());
+        }
+
+        public async Task<IEnumerable<ExpenseBySummaryCategoryResponse>> GetExpensesByCategoryAsync(TransactionPeriod transactionPeriod)
+        {
+            IEnumerable<ExpenseByCategory> expenseByCategories = await _expenseRepository.GetExpenseByCategoryAsync(transactionPeriod);
             return ExpenseBySummaryCategoryResponse.From(expenseByCategories);
         }
     }
